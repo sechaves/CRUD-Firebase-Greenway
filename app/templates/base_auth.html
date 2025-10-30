@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Autenticación{% endblock %} - GREENWAY</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Estilos Comunes de base_auth.html --- */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+        }
+
+        :root {
+            --greenway-primary: #A6D204;
+            --greenway-accent: #6B8BFF;
+            --greenway-text: #222;
+        }
+
+        /* Slider de Fondo */
+        #background-slider {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+        .background-slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .background-slide.active {
+            opacity: 1;
+        }
+
+        /* Contenedor principal (para centrar) */
+        .auth-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    
+    <div id="background-slider">
+        <div class="background-slide"></div>
+        <div class="background-slide"></div>
+    </div>
+
+    <main class="container auth-container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = [
+                'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
+                'https://wallpapercave.com/wp/wp13667471.jpg',
+                'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
+                'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
+                'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
+                'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
+            ];
+
+            const slides = document.querySelectorAll('.background-slide');
+            let currentSlide = 0;
+            let imageIndex = 0;
+
+            function changeBackground() {
+                imageIndex = (imageIndex + 1) % images.length;
+                const nextSlide = (currentSlide + 1) % slides.length;
+                slides[nextSlide].style.backgroundImage = `url('${images[imageIndex]}')`;
+                slides[nextSlide].classList.add('active');
+                slides[currentSlide].classList.remove('active');
+                currentSlide = nextSlide;
+            }
+
+            if (slides.length > 0) {
+                slides[0].style.backgroundImage = `url('${images[0]}')`;
+                slides[0].classList.add('active');
+                setInterval(changeBackground, 6000);
+            }
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

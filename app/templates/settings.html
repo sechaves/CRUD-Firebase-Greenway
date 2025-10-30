@@ -1,11 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Configuración{% endblock %}
+
+{% block styles %}
+<style>
+    .card-header { 
+        background-color: var(--greenway-primary); 
+        color: white; 
+        font-weight: 700; 
+    }
+
+    /* Estilo para separar las secciones de configuración */
+    .settings-section {
+        margin-bottom: 2.5rem;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <h1 class="mb-4">Configuración</h1>
+
+            <div class="settings-section">
+                <h3>Seguridad</h3>
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        Cambiar Contraseña
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="#">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label">Contraseña Actual</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Actualizar Contraseña</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Preferencias</h3>
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        Notificaciones por Correo
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="#">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchPromos" name="promos" checked>
+                                <label class="form-check-label" for="switchPromos">Recibir promociones y boletines.</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchReservas" name="reservas" checked>
+                                <label class="form-check-label" for="switchReservas">Alertas sobre mis reservas.</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchUpdates" name="updates">
+                                <label class="form-check-label" for="switchUpdates">Noticias sobre actualizaciones de la plataforma.</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3" style="background-color: var(--greenway-accent); border: none;">Guardar Preferencias</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

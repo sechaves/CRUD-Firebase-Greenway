@@ -1,53 +1,137 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - GREENWAY</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #fafafa; padding-top: 70px; }
-        :root { --greenway-primary: #A6D204; }
-        .card-header { background-color: var(--greenway-primary); color: white; font-weight: 700; }
-        .danger-zone { border: 1px solid #dc3545; border-radius: 8px; }
-    </style>
-</head>
-<body>
+<!-- 1. Hereda de la plantilla principal (con navbar y footer) -->
+{% extends "base.html" %}
+
+<!-- 2. Define el título de la página -->
+{% block title %}Mi Perfil{% endblock %}
+
+<!-- 3. Define los estilos CSS específicos para esta página -->
+{% block styles %}
+<style>
+    .card-header { 
+        background-color: var(--greenway-primary); 
+        color: white; 
+        font-weight: 700; 
+    }
     
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                
-                <h1 class="mb-4">Configuración de la Cuenta</h1>
+    .danger-zone { 
+        border: 1px solid #dc3545; 
+        border-radius: 8px; 
+    }
+</style>
+{% endblock %}
 
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header">
-                        Mi Perfil
-                    </div>
-                    <div class="card-body">
-                        {% if user %}
-                            <p><strong>Nombre:</strong> {{ user.nombre }}</p>
-                            <p><strong>Email:</strong> {{ user.email }}</p>
-                            <a href="#" class="btn btn-outline-primary">Editar Perfil (Próximamente)</a>
-                        {% else %}
-                            <p>Error al cargar los datos del usuario.</p>
-                        {% endif %}
-                    </div>
+
+<!-- 4. Define el contenido principal de la página -->
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <h1 class="mb-4">Configuración de la Cuenta</h1>
+
+            <!-- ============================================= -->
+            <!-- Tarjeta de Información del Perfil -->
+            <!-- ============================================= -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    Mi Perfil
                 </div>
+                <div class="card-body">
+                    {% if user %}
+                        <p><strong>Nombre:</strong> {{ user.nombre }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        
+                        <!-- BOTÓN PARA ABRIR EL MODAL DE EDICIÓN -->
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            Editar Perfil
+                        </button>
 
-                <div class="p-4 danger-zone">
-                    <h5 class="text-danger">Zona de Peligro</h5>
-                    <p class="text-muted">Una vez que eliminas tu cuenta, no hay vuelta atrás. Por favor, asegúrate.</p>
-                    
-                    <form action="#" method="POST"> <button type="submit" class="btn btn-danger" disabled>Eliminar mi cuenta (Próximamente)</button>
-                    </form>
+                    {% else %}
+                        <p>Error al cargar los datos del usuario.</p>
+                    {% endif %}
                 </div>
-
             </div>
+
+            <!-- ============================================= -->
+            <!-- Tarjeta de Zona de Peligro -->
+            <!-- ============================================= -->
+            <div class="p-4 danger-zone">
+                <h5 class="text-danger">Zona de Peligro</h5>
+                <p class="text-muted">Una vez que eliminas tu cuenta, no hay vuelta atrás. Por favor, asegúrate.</p>
+                
+                <!-- BOTÓN PARA ABRIR EL MODAL DE ELIMINACIÓN -->
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    Eliminar mi cuenta
+                </button>
+            </div>
+
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+
+
+<!-- =================================================================== -->
+<!-- MODAL 1: Editar Perfil (Pop-up) -->
+<!-- =================================================================== -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Editar Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Formulario que envía los datos a la nueva ruta /update-profile -->
+            <form action="{{ url_for('update_profile') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre Completo</label>
+                        <!-- 'value={{ user.nombre }}' precarga el nombre actual -->
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ user.nombre }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <!-- El email no se puede cambiar -->
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" disabled>
+                        <div class="form-text">El correo electrónico no se puede modificar.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Guardar Cambios</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- =================================================================== -->
+<!-- MODAL 2: Confirmar Eliminación (Pop-up) -->
+<!-- =================================================================== -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #dc3545; color: white;">
+                <h5 class="modal-title" id="deleteAccountModalLabel">¿Estás absolutamente seguro?</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Formulario que envía la orden a la nueva ruta /delete-account -->
+            <form action="{{ url_for('delete_account') }}" method="POST">
+                <div class="modal-body">
+                    <p>Esta acción es **irreversible**.</p>
+                    <p>Se eliminará tu cuenta de <strong>Firebase Authentication</strong> y todos tus datos (perfil, reservas, etc.) de la <strong>Realtime Database</strong>.</p>
+                    <p>Nadie podrá recuperar esta información. ¿Deseas continuar?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar, me arrepentí</button>
+                    <button type="submit" class="btn btn-danger">Sí, entiendo, eliminar mi cuenta</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
