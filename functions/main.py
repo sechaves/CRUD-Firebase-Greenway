@@ -3,11 +3,10 @@ import os
 from functools import wraps
 # Asegúrate de que todas las importaciones de Flask estén aquí
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify 
+from firebase_functions import https_fn
+from firebase_admin import initialize_app
 
-# --- Añadir el proyecto raíz al path ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, project_root)
-# -----------------------------------------------------------------
+initialize_app()
 
 # SDKs de Firebase (Cliente y Admin)
 from data.firebase_config import auth, db
@@ -430,22 +429,6 @@ def ask_chatbot():
     except Exception as e:
         print(f"Error en el chatbot: {e}")
         return jsonify({'error': 'Error interno al procesar tu pregunta.'}), 500
-
-# =================================================================
-# INICIO DE LA APP
-# =================================================================
-
-if __name__ == '__main__':
-    # Verificaciones de arranque
-    if admin_auth is None:
-        print("Error crítico: No se pudo inicializar el SDK de Admin (serviceAccountKey.json).")
-    elif chatbot is None and chatbot_importado:
-        print("Error crítico: No se pudo inicializar el Chatbot (API Key .env).")
-    else:
-        print("************************************")
-        print("SDK de Admin de Firebase inicializado con éxito.")
-        if chatbot_importado: print("Chatbot de OpenAI inicializado con éxito.")
-        print("*** Servidor Flask v3.0 (POO) LISTO ***")
-        print("************************************")
-        app.run(debug=True, port=5000)
+    
+api = https_fn.on_request(app)
 
