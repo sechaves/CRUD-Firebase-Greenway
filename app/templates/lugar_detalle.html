@@ -1,0 +1,75 @@
+<!-- Hereda de la plantilla base -->
+{% extends "base.html" %}
+
+<!-- El título será el nombre del lugar -->
+{% block title %}{{ lugar.nombre }}{% endblock %}
+
+{% block styles %}
+<style>
+    .lugar-imagen {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .precio-tag {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--greenway-primary);
+    }
+    .btn-reservar {
+        background-color: var(--greenway-accent);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+
+<!-- Define el contenido de la página -->
+{% block content %}
+<div class="container my-5">
+    
+    {% if lugar %}
+    <div class="row">
+        <!-- Columna de la Imagen -->
+        <div class="col-lg-7 mb-4">
+            <img src="{{ lugar.imagen_url }}" class="lugar-imagen" alt="{{ lugar.nombre }}">
+        </div>
+
+        <!-- Columna de Detalles y Reserva -->
+        <div class="col-lg-5">
+            <h1 class="display-5 fw-bold">{{ lugar.nombre }}</h1>
+            <p class="lead text-muted">Registrado por: {{ lugar.nombre_propietario }}</p>
+            
+            <hr class="my-4">
+
+            <p class="fs-5">{{ lugar.descripcion }}</p>
+
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <span class="precio-tag">
+                    ${{ "{:,.0f}".format(lugar.precio_noche) }} COP
+                </span>
+                <span class="text-muted">/ por noche</span>
+            </div>
+
+            <button class="btn btn-reservar w-100" disabled>
+                Reservar (Próximamente)
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <h2>Oops!</h2>
+        <p>Parece que este lugar no existe o no se pudo cargar.</p>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al Inicio</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+

@@ -13,16 +13,18 @@
     <style>
         /* --- ESTILOS COMUNES PARA TODO EL SITIO --- */
         
+        :root {
+            --greenway-primary: #A6D204; /* Verde principal */
+            --greenway-accent: #FBCD4B;   /* Naranja (para el chat) */
+            --greenway-yellow-light: #FBEE3F; /* Amarillo alerta */
+            --greenway-blue: #648BFF;       /* Azul info */
+            --greenway-text: #222;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #fafafa;
-        }
-
-        :root {
-            --greenway-primary: #A6D204;
-            --greenway-accent: #FBCD4B;
-            --greenway-bg-light: #FFFCE8;
-            --greenway-text: #222;
+            /* El padding-top se añade con JS para que sea dinámico */
         }
 
         /* NAVBAR (Común) */
@@ -54,156 +56,123 @@
 
         /* ANIMATIONS (Común) */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
         
-        /* --- N NUEVOS ESTILOS PARA EL CHATBOT --- */
-        #chat-toggle-button {
+        /* Colores de Alertas (Flash) Personalizados */
+        .alert-success { background-color: var(--greenway-primary); color: white; border: none; }
+        .alert-danger { background-color: #dc3545; color: white; border: none; }
+        .alert-info { background-color: var(--greenway-blue); color: white; border: none; }
+        .alert-warning { background-color: var(--greenway-yellow-light); color: var(--greenway-text); border: none; }
+
+        /* --- ESTILOS DEL CHATBOT --- */
+        #chat-toggle {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: var(--greenway-accent);
-            color: white;
             width: 60px;
             height: 60px;
+            background-color: var(--greenway-accent); /* Color del botón */
+            color: white;
             border-radius: 50%;
             border: none;
             font-size: 28px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 1040;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
-        #chat-toggle-button:hover {
+        #chat-toggle:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            background-color: #e9b33a; /* Un poco más oscuro al pasar el mouse */
         }
-
         #chat-window {
             position: fixed;
             bottom: 90px;
             right: 20px;
             width: 350px;
-            max-width: 90vw;
             height: 450px;
             background-color: white;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            z-index: 1039;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 1039;
             /* Oculto por defecto */
             opacity: 0;
-            transform: scale(0.95) translateY(10px);
+            transform: translateY(20px);
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
         }
-        #chat-window.visible {
+        #chat-window.open {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: translateY(0);
             visibility: visible;
         }
-
         #chat-header {
-            background-color: var(--greenway-accent);
+            background-color: var(--greenway-accent); /* Color del header */
             color: white;
             padding: 15px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
         }
-        #chat-header h5 { margin: 0; }
-        #chat-close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            opacity: 0.8;
-        }
-        #chat-close-btn:hover { opacity: 1; }
-
         #chat-messages {
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            background-color: #f9f9f9;
-        }
-        .chat-message {
-            margin-bottom: 15px;
             display: flex;
             flex-direction: column;
+            gap: 12px;
         }
-        .chat-message.user {
-            align-items: flex-end;
-        }
-        .chat-message.bot {
-            align-items: flex-start;
-        }
-        .chat-message .message-bubble {
-            padding: 10px 15px;
-            border-radius: 18px;
+        .chat-message {
+            padding: 10px 14px;
+            border-radius: 20px;
             max-width: 80%;
-            word-wrap: break-word;
+            line-height: 1.4;
         }
-        .chat-message.user .message-bubble {
-            background-color: #e6e6e6;
+        .user-message {
+            background-color: #f1f1f1;
             color: #333;
+            align-self: flex-end;
             border-bottom-right-radius: 5px;
         }
-        .chat-message.bot .message-bubble {
-            background-color: var(--greenway-primary);
+        .bot-message {
+            background-color: var(--greenway-accent);
             color: white;
+            align-self: flex-start;
             border-bottom-left-radius: 5px;
         }
-        .chat-message .message-sender {
-            font-size: 0.75rem;
-            color: #777;
-            margin: 0 10px 4px;
-        }
-        /* Clase 'loading' para el bot */
-        .chat-message.bot.loading .message-bubble {
-            color: #ddd;
+        .bot-message.loading {
+            /* Animación de "escribiendo..." */
             animation: pulse 1.5s infinite;
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-
-        #chat-input-area {
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        #chat-form {
             display: flex;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #eee;
             padding: 10px;
         }
         #chat-input {
             flex-grow: 1;
-            border: 1px solid #ccc;
+            border: none;
+            padding: 10px;
             border-radius: 20px;
-            padding: 8px 15px;
-            outline: none;
+            background-color: #f7f7f7;
         }
         #chat-input:focus {
-            border-color: var(--greenway-accent);
-            box-shadow: 0 0 0 2px rgba(107, 139, 255, 0.2);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--greenway-accent);
         }
-        #chat-send-btn {
-            background-color: var(--greenway-accent);
+        #chat-submit {
+            background: none;
             border: none;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
-            font-size: 18px;
+            color: var(--greenway-accent);
+            font-size: 20px;
+            padding: 0 10px;
         }
-        /* --- FIN ESTILOS CHATBOT --- */
-
     </style>
 
     <!-- Bloque para estilos específicos de cada página -->
@@ -215,27 +184,51 @@
     <!-- ======== NAVBAR (EN BASE.HTML) ======== -->
     <nav class="navbar navbar-expand-lg navbar-greenway">
         <div class="container-fluid d-flex justify-content-between align-items-center">
+            
             <div style="width: 100px;"></div> 
-            <div class="d-flex mx-auto align-items: center"> 
+
+            <div class="d-flex mx-auto align-items-center"> 
                 <a class="navbar-brand me-4" href="{{ url_for('home') }}">
                     GREENWAY 
                 </a>
                 <div class="collapse navbar-collapse show" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Alojamiento</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Eventos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Experiencias completas</a></li>
+                        
+                        <!-- ================================== -->
+                        <!-- ¡¡LINK DE NAVEGACIÓN CORREGIDO!! -->
+                        <!-- ================================== -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('alojamientos') }}">Alojamiento</a></li>
+                        
+                        <!-- Lógica de Roles -->
+                        {% if session.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_panel') }}">Panel de Admin</a>
+                            </li>
+                        {% elif session.role == 'propietaria' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('crear_lugar_form') }}">Registrar Lugar</a>
+                            </li>
+                        {% endif %}
+                        <!-- Fin de la lógica de roles -->
+
                     </ul>
                 </div>
             </div>
+            
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="btn btn-sm btn-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Cuenta
+                        <!-- Muestra el email si está en la sesión -->
+                        {% if session.user_email %}
+                            {{ session.user_email.split('@')[0] }}
+                        {% else %}
+                            Cuenta
+                        {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ url_for('profile') }}">Mi Perfil</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('settings') }}">Configuración</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
                     </ul>
@@ -245,10 +238,10 @@
     </nav>
 
     <!-- ======== CONTENEDOR DE NOTIFICACIONES (FLASH) ======== -->
-    <div class="container" style="position: relative; z-index: 1025;">
+    <div class="container" style="position: relative; z-index: 1025; margin-top: 1rem;">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            <div style="padding-top: 1rem;"> <!-- Padding para que no se pegue a la navbar -->
+            <div class="mt-2">
               {% for category, message in messages %}
                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                   {{ message }}
@@ -295,175 +288,146 @@
         </div>
     </footer>
 
-
-    <!-- ====================================================== -->
-    <!-- ===   NUEVO HTML PARA EL CHATBOT   === -->
-    <!-- ====================================================== -->
-    
-    <!-- 1. El Botón Flotante -->
-    <button id="chat-toggle-button">
-        <i class="bi bi-chat-dots"></i>
-    </button>
-
-    <!-- 2. La Ventana del Chat (Oculta) -->
+    <!-- ======== CHATBOT HTML (EN BASE.HTML) ======== -->
     <div id="chat-window">
-        <!-- Cabecera del Chat -->
-        <div id="chat-header">
-            <h5>Greenway-bot</h5>
-            <button id="chat-close-btn">&times;</button>
-        </div>
-        
-        <!-- Contenedor de Mensajes -->
+        <div id="chat-header">Chat Greenway 🐝</div>
         <div id="chat-messages">
-            <!-- Mensaje de bienvenida del Bot -->
-            <div class="chat-message bot">
-                <span class="message-sender">Greenway-bot</span>
-                <div class="message-bubble">
-                    ¡Hola! Soy Greenway-bot. ¿En qué puedo ayudarte hoy sobre ecoturismo o nuestro santuario de abejas?
-                </div>
+            <div class="bot-message">
+                ¡Hola! Soy Greenway-bot. ¿En qué puedo ayudarte hoy?
             </div>
         </div>
-
-        <!-- Área de Input -->
-        <div id="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Escribe tu pregunta...">
-            <button id="chat-send-btn">
-                <i class="bi bi-send"></i>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off">
+            <button type="submit" id="chat-submit">
+                <i class="bi bi-send-fill"></i>
             </button>
-        </div>
+        </form>
     </div>
-    
+    <button id="chat-toggle">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
 
-    <!-- ====================================================== -->
-    <!-- ===   SCRIPTS   === -->
-    <!-- ====================================================== -->
 
+    <!-- ======== SCRIPTS COMUNES (EN BASE.HTML) ======== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- SCRIPT PARA LA SMART NAVBAR (Común) -->
     <script>
-        let prevScrollPos = window.pageYOffset;
-        const navbar = document.querySelector('.navbar-greenway');
-        // Ajusta el padding del body para que el contenido no quede oculto bajo la navbar fija
-        document.body.style.paddingTop = navbar.offsetHeight + 'px'; 
-        
-        window.onscroll = function() {
-            const currentScrollPos = window.pageYOffset;
-            if (prevScrollPos > currentScrollPos) {
-                navbar.classList.remove('navbar-hidden');
-            } else {
-                if (currentScrollPos > navbar.offsetHeight + 50) { 
-                    navbar.classList.add('navbar-hidden');
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            let prevScrollPos = window.pageYOffset;
+            const navbar = document.querySelector('.navbar-greenway');
+            
+            // Ajuste dinámico del padding-top del body
+            if (navbar) {
+                document.body.style.paddingTop = navbar.offsetHeight + 'px';
             }
-            prevScrollPos = currentScrollPos;
-        }
-    </script>
-
-
-    <!-- ====================================================== -->
-    <!-- ===   NUEVO JAVASCRIPT PARA EL CHATBOT   === -->
-    <!-- ====================================================== -->
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- Referencias a elementos del DOM ---
-        const chatWindow = document.getElementById('chat-window');
-        const chatToggleButton = document.getElementById('chat-toggle-button');
-        const chatCloseButton = document.getElementById('chat-close-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatSendButton = document.getElementById('chat-send-btn');
-
-        // --- Funciones para abrir/cerrar chat ---
-        function toggleChatWindow() {
-            chatWindow.classList.toggle('visible');
-        }
-
-        // --- Event Listeners para abrir/cerrar ---
-        chatToggleButton.addEventListener('click', toggleChatWindow);
-        chatCloseButton.addEventListener('click', toggleChatWindow);
-
-        // --- Función principal para enviar el mensaje ---
-        async function sendMessage() {
-            const pregunta = chatInput.value.trim();
-            if (pregunta === "") return; // No enviar mensajes vacíos
-
-            // 1. Mostrar el mensaje del usuario en la UI
-            addMessageToUI('user', pregunta);
-            chatInput.value = ""; // Limpiar el input
-
-            // 2. Mostrar la burbuja de "cargando" del bot
-            const loadingBubble = addMessageToUI('bot', '...');
-            loadingBubble.classList.add('loading'); // Añadir clase para animación
-
-            try {
-                // 3. Enviar la pregunta al backend (Flask)
-                const response = await fetch('/ask-chatbot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ pregunta: pregunta })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error del servidor: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                // 4. Actualizar la burbuja de "cargando" con la respuesta real
-                loadingBubble.classList.remove('loading');
-                if (data.respuesta) {
-                    loadingBubble.querySelector('.message-bubble').textContent = data.respuesta;
+            
+            window.onscroll = function() {
+                if (!navbar) return;
+                const currentScrollPos = window.pageYOffset;
+                if (prevScrollPos > currentScrollPos) {
+                    navbar.classList.remove('navbar-hidden');
                 } else {
-                    loadingBubble.querySelector('.message-bubble').textContent = data.error || "Hubo un error inesperado.";
+                    if (currentScrollPos > navbar.offsetHeight + 50) { 
+                        navbar.classList.add('navbar-hidden');
+                    }
                 }
-
-            } catch (error) {
-                console.error("Error en el fetch del chatbot:", error);
-                // 5. Mostrar error en la burbuja de "cargando"
-                loadingBubble.classList.remove('loading');
-                loadingBubble.querySelector('.message-bubble').textContent = "No puedo conectarme ahora mismo. Intenta más tarde.";
-                loadingBubble.querySelector('.message-bubble').style.backgroundColor = '#dc3545'; // Color rojo de error
-            }
-        }
-
-        // --- Función helper para añadir mensajes a la UI ---
-        function addMessageToUI(sender, message) {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.className = `chat-message ${sender}`;
-            
-            const senderName = document.createElement('span');
-            senderName.className = 'message-sender';
-            senderName.textContent = (sender === 'user') ? 'Tú' : 'Greenway-bot';
-
-            const messageBubble = document.createElement('div');
-            messageBubble.className = 'message-bubble';
-            messageBubble.textContent = message;
-
-            messageWrapper.appendChild(senderName);
-            messageWrapper.appendChild(messageBubble);
-            chatMessages.appendChild(messageWrapper);
-
-            // Auto-scroll al fondo
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            return messageWrapper; // Devolvemos el wrapper para poder modificarlo (ej. loading)
-        }
-
-        // --- Event Listeners para enviar mensaje ---
-        chatSendButton.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            // Enviar con la tecla "Enter"
-            if (e.key === 'Enter') {
-                sendMessage();
+                prevScrollPos = currentScrollPos;
             }
         });
-
-    });
     </script>
 
+    <!-- SCRIPT DEL CHATBOT (EN BASE.HTML) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatWindow = document.getElementById('chat-window');
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            // 1. Abrir/Cerrar el chat
+            if (chatToggle) { // Asegurarse de que el elemento exista
+                chatToggle.addEventListener('click', () => {
+                    chatWindow.classList.toggle('open');
+                    // Cambiar el ícono
+                    const icon = chatToggle.querySelector('i');
+                    if (chatWindow.classList.contains('open')) {
+                        icon.classList.remove('bi-chat-dots-fill');
+                        icon.classList.add('bi-x-lg');
+                    } else {
+                        icon.classList.remove('bi-x-lg');
+                        icon.classList.add('bi-chat-dots-fill');
+                    }
+                });
+            }
+
+            // 2. Enviar el formulario
+            if (chatForm) { // Asegurarse de que el elemento exista
+                chatForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const userMessage = chatInput.value.trim();
+                    if (userMessage === '') return;
+
+                    // Añadir mensaje del usuario al chat
+                    addMessage(userMessage, 'user');
+                    chatInput.value = '';
+
+                    // Mostrar "escribiendo..."
+                    addMessage('...', 'bot', true);
+                    
+                    // Enviar al backend (main.py)
+                    fetch('/ask-chatbot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ pregunta: userMessage })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Quitar el "escribiendo..."
+                        removeLoadingMessage();
+                        
+                        if (data.respuesta) {
+                            addMessage(data.respuesta, 'bot');
+                        } else {
+                            addMessage('Lo siento, hubo un error. Intenta de nuevo.', 'bot');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en el chat:', error);
+                        removeLoadingMessage();
+                        addMessage('Error de conexión con el bot. 🤖', 'bot');
+                    });
+                });
+            }
+
+            // --- Funciones auxiliares del chat ---
+
+            function addMessage(text, sender, isLoading = false) {
+                const messageEl = document.createElement('div');
+                messageEl.classList.add('chat-message');
+                messageEl.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                if (isLoading) {
+                    messageEl.classList.add('loading');
+                }
+                messageEl.textContent = text;
+                chatMessages.appendChild(messageEl);
+                
+                // Auto-scroll al fondo
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function removeLoadingMessage() {
+                const loadingEl = chatMessages.querySelector('.bot-message.loading');
+                if (loadingEl) {
+                    loadingEl.remove();
+                }
+            }
+
+        });
+    </script>
 
     <!-- Bloque para scripts específicos de cada página -->
     {% block scripts %}{% endblock %}

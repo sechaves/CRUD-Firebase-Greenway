@@ -4,6 +4,7 @@
 
 {% block styles %}
 <style>
+    /* Estilos copiados de login.html para consistencia */
     .brand-logo {
         font-weight: 900;
         font-size: 2.5rem;
@@ -13,22 +14,14 @@
         letter-spacing: 2px;
         margin-bottom: 20px;
     }
-    .brand-logo:hover {
-        color: #eee;
-    }
-
+    .brand-logo:hover { color: #eee; }
     .card {
         border: none;
         border-top: 6px solid var(--greenway-primary);
         border-radius: 15px;
         background-color: rgba(255, 255, 255, 0.95);
     }
-
-    .card-title {
-        color: var(--greenway-text);
-        font-weight: 700;
-    }
-    
+    .card-title { color: var(--greenway-text); font-weight: 700; }
     .btn-greenway {
         background-color: var(--greenway-primary);
         border-color: var(--greenway-primary);
@@ -37,26 +30,30 @@
         padding: 10px 0;
         transition: all 0.3s ease;
     }
-
     .btn-greenway:hover {
         background-color: #8db303; 
         border-color: #8db303;
         color: white;
         transform: translateY(-2px);
     }
-
     .form-control:focus {
         border-color: var(--greenway-primary);
         box-shadow: 0 0 0 0.25rem rgba(166, 210, 4, 0.25);
     }
-
     .link-accent {
         color: var(--greenway-accent);
         text-decoration: none;
         font-weight: 600;
     }
-    .link-accent:hover {
-        text-decoration: underline;
+    .link-accent:hover { text-decoration: underline; }
+
+    /* Estilo para los botones de radio */
+    .form-check-label {
+        font-weight: 500;
+    }
+    .form-check-input:checked {
+        background-color: var(--greenway-primary);
+        border-color: var(--greenway-primary);
     }
 </style>
 {% endblock %}
@@ -72,7 +69,9 @@
             <div class="card-body p-4">
                 <h2 class="card-title mb-4">Crea tu cuenta</h2>
                 
+                <!-- El formulario AHORA apunta a 'signup' -->
                 <form method="POST" action="{{ url_for('signup') }}">
+                    
                     <div class="mb-3 text-start">
                         <label for="nombre" class="form-label">Nombre Completo</label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
@@ -83,11 +82,35 @@
                         <input type="email" class="form-control" id="email" name="email" required>
                     </div>
                     
-                    <div class="mb-4 text-start">
+                    <div class="mb-3 text-start">
                         <label for="password" class="form-label">Contraseña</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-                    
+
+                    <!-- ============================================= -->
+                    <!-- ¡¡SECCIÓN DE ROLES!! -->
+                    <!-- ============================================= -->
+                    <div class="mb-4 text-start">
+                        <label class="form-label" style="font-weight: 600;">Tipo de Cuenta</label>
+                        <div class="form-check">
+                            <!-- 
+                                name="rol" es lo que lee main.py (request.form.get('rol'))
+                                value="usuario" es el valor que se envía.
+                            -->
+                            <input class="form-check-input" type="radio" name="rol" id="rolUsuario" value="usuario" checked>
+                            <label class="form-check-label" for="rolUsuario">
+                                Usuario (Para reservar)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="rol" id="rolPropietaria" value="propietaria">
+                            <label class="form-check-label" for="rolPropietaria">
+                                Propietario (Para registrar lugares)
+                            </label>
+                        </div>
+                    </div>
+                    <!-- ============================================= -->
+
                     <button type="submit" class="btn btn-greenway w-100">Registrarse</button>
                 </form>
                 
@@ -97,6 +120,7 @@
             </div>
         </div>
 
+        <!-- Bloque de Notificaciones (Flash Messages) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="mt-3">
@@ -113,3 +137,4 @@
     </div>
 </div>
 {% endblock %}
+

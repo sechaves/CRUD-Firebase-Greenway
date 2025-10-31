@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Admin{% endblock %}
+
+{% block styles %}
+<style>
+    .card-header-custom {
+        font-weight: 700;
+        background-color: var(--greenway-yellow-light);
+        color: var(--greenway-text);
+        border-color: #e9e1c3;
+    }
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Panel de Administración</h1>
+            <p class="fs-5 text-muted">Gestión de todos los roles de la plataforma.</p>
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- Sección de Administradores -->
+    <!-- ============================================= -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3 class="mb-3">Administradores</h3>
+            <div class="card shadow-sm">
+                <div class="card-header card-header-custom">
+                    <i class="bi bi-person-badge-fill"></i> Lista de Admins
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID de Usuario</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user_id, user in admins.items() %}
+                                <tr>
+                                    <td class="font-monospace small">{{ user_id }}</td>
+                                    <td>{{ user.nombre }}</td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No hay administradores registrados en la base de datos.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- Sección de Propietarios -->
+    <!-- ============================================= -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-3">Propietarios</h3>
+            <div class="card shadow-sm">
+                <div class="card-header card-header-custom" style="background-color: var(--greenway-accent); color: white;">
+                    <i class="bi bi-house-gear-fill"></i> Lista de Propietarios
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID de Usuario</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user_id, user in propietarios.items() %}
+                                <tr>
+                                    <td class="font-monospace small">{{ user_id }}</td>
+                                    <td>{{ user.nombre }}</td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No hay propietarios registrados en la base de datos.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- Sección de Usuarios -->
+    <!-- ============================================= -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-3">Usuarios</h3>
+            <div class="card shadow-sm">
+                <div class="card-header card-header-custom" style="background-color: var(--greenway-blue); color: white;">
+                    <i class="bi bi-person-fill"></i> Lista de Usuarios
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">ID de Usuario</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user_id, user in usuarios.items() %}
+                                <tr>
+                                    <td class="font-monospace small">{{ user_id }}</td>
+                                    <td>{{ user.nombre }}</td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No hay usuarios registrados en la base de datos.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+

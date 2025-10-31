@@ -4,7 +4,7 @@
 
 {% block styles %}
 <style>
-    /* SECCIÓN HERO (Específico de Home) */
+    /* --- Estilos del Hero (sin cambios) --- */
     .hero-section {
         height: 80vh;
         position: relative;
@@ -14,7 +14,6 @@
         justify-content: center;
         text-align: center;
         background-color: #333;
-        /* Quitamos el 'padding-top' de aquí, ya lo maneja el body en base.html */
     }
     #hero-background-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     .hero-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
@@ -23,40 +22,16 @@
     .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
     .hero-sub { font-weight: 500; font-size: 1.1rem; }
 
-    /* ESTILOS DE SECCIÓN DE EVENTOS (Específico de Home) */
+    /* --- ESTILOS DE SECCIÓN DE ALOJAMIENTOS (ACTUALIZADOS) --- */
     .events-section {
         padding: 60px 0;
         position: relative;
-        overflow: hidden;
-    }
-    #section-bg-image {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: 0;
-        background-size: cover;
-        background-position: center;
-        opacity: 0;
-        transition: opacity 0.7s ease-in-out;
-    }
-    #section-bg-image::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(255, 255, 255, 0.92);
-        z-index: 1;
-        opacity: 0; /* Lo quité, revisa si necesitas este velo */
-        transition: opacity 0.3s ease;
-    }
-    .events-section > .container {
-        position: relative;
-        z-index: 2;
+        overflow: hidden; /* Oculta el scrollbar horizontal del contenedor */
     }
     .section-title {
         font-weight: 900;
         font-size: 2.5rem;
-        color: #222;
+        color: var(--greenway-text);
         margin-bottom: 10px;
     }
     .section-subtitle {
@@ -64,28 +39,84 @@
         color: #555;
         margin-bottom: 50px;
     }
+    
+    /* --- ¡NUEVO! Estilos para las tarjetas (copiados de alojamientos.html) --- */
     .event-card {
         background-color: #fff;
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease-in-out;
+        height: 100%; 
+        display: flex;
+        flex-direction: column;
     }
     .event-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
-    .event-card-image img { width: 100%; height: 250px; object-fit: cover; }
-    .event-card-content { padding: 20px; }
-    .event-card-content h5 { font-weight: 700; color: #222; font-size: 1.4rem; }
+    .event-card-image img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+    .event-card-content {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; }
     .event-card-content .price { font-size: 1.1rem; font-weight: 600; color: #444; margin-top: 5px; }
-    .event-card-rating { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
-    .rating-stats { font-size: 0.8rem; color: #666; line-height: 1.4; }
-    .rating-stats strong { font-size: 0.9rem; color: #111; }
-    .rating-stars { color: #FFC107; font-size: 1.1rem; }
+    
+    .card-footer-custom {
+        margin-top: auto; 
+        border-top: 1px solid #eee;
+        padding: 15px 20px 20px 20px;
+    }
+    .btn-greenway-details {
+        background-color: var(--greenway-primary);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-greenway-details:hover {
+        background-color: #8db303; 
+        color: white;
+    }
+    
+    /* --- ¡NUEVO! Estilos para el Carrusel (como en Booking.com) --- */
+    .carousel-container {
+        overflow-x: auto; /* ¡Magia! */
+        padding-bottom: 20px; /* Espacio para la sombra */
+    }
+    .carousel-track {
+        display: flex;
+        gap: 20px; /* Espacio entre tarjetas */
+        width: max-content; /* Evita que las tarjetas se apilen */
+    }
+    .carousel-card {
+        flex: 0 0 350px; /* Ancho fijo para cada tarjeta */
+        display: inline-block;
+        vertical-align: top;
+        white-space: normal; /* Resetea el white-space */
+    }
+    /* Estilos para el scrollbar (opcional pero bonito) */
+    .carousel-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    .carousel-container::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+    .carousel-container::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
 </style>
 {% endblock %}
 
+<!-- 4. Definimos el bloque de contenido (el HTML de esta página) -->
 {% block content %}
     <div class="hero-section">
         <div id="hero-background-slider">
@@ -101,102 +132,70 @@
         </div>
     </div>
 
+    <!-- ============================================= -->
+    <!-- ¡SECCIÓN ACTUALIZADA! -->
+    <!-- ============================================= -->
     <section class="events-section">
-        <div id="section-bg-image"></div> 
-        <div class="container">
+        <div class="container"> 
+            
+            <!-- Títulos cambiados -->
             <div class="row text-center">
                 <div class="col-12">
-                    <h2 class="section-title">LOS MEJORES EVENTOS A TU DISPOSICION</h2>
-                    <p class="section-subtitle">Vive las mejores experiencias en eventos únicos cerca de tu ubicación de preferencia</p>
+                    <h2 class="section-title">ALOJAMIENTOS DESTACADOS</h2>
+                    <p class="section-subtitle">Descubre los lugares únicos registrados por nuestr@s propietari@s.</p>
                 </div>
             </div>
 
-            <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="event-card">
-                        <div class="event-card-image">
-                            <img src="https://www.minambiente.gov.co/wp-content/uploads/2021/10/noticia-2016-Con-ecoturismo-comunitario-Colombia-renueva-su-oferta-para-vacaciones-scaled.jpg" alt="Evento 1">
-                        </div>
-                        <div class="event-card-content">
-                            <h5>Parque Nacional del Cocóra</h5>
-                            <p class="price">Desde 449.990 $ por persona</p>
-                            <div class="event-card-rating">
-                                <div class="rating-stats">
-                                    Puntaje &nbsp; • &nbsp; Reseñas<br>
-                                    <strong>4.12</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <strong>1500</strong>
+            <!-- ¡NUEVO CARRUSEL DINÁMICO! -->
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    
+                    <!-- 
+                        Iteramos sobre los 'hospedajes' que pasamos desde main.py
+                    -->
+                    {% for lugar in hospedajes %}
+                        <div class="carousel-card"> <!-- Tarjeta individual del carrusel -->
+                            <div class="event-card w-100"> <!-- Usamos el estilo 'event-card' -->
+                                <div class="event-card-image">
+                                    <img src="{{ lugar.imagen_url }}" alt="{{ lugar.nombre }}">
                                 </div>
-                                <div class="rating-stars">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star"></i> 
+                                <div class="event-card-content">
+                                    <h5>{{ lugar.nombre }}</h5>
+                                    <p class="price">Desde {{ "${:,.0f}".format(lugar.precio_noche) }} COP / noche</p>
+                                    <p class="text-muted">
+                                        {{ lugar.descripcion | truncate(100) }}
+                                    </p>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="event-card">
-                        <div class="event-card-image">
-                            <img src="https://radionacional-v3.s3.amazonaws.com/s3fs-public/node/article/field_image/ciudad%20perdida%202.jpg" alt="Evento 2">
-                        </div>
-                        <div class="event-card-content">
-                            <h5>Sierra Nevada de Santa Marta</h5>
-                            <p class="price">Desde 999.999 $ por persona</p>
-                            <div class="event-card-rating">
-                                <div class="rating-stats">
-                                    Puntaje &nbsp; • &nbsp; Reseñas<br>
-                                    <strong>4.89</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <strong>1578</strong>
-                                </div>
-                                <div class="rating-stars">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i> 
+                                <div class="card-footer-custom">
+                                    <a href="{{ url_for('lugar_detalle', lugar_id=lugar.id) }}" class="btn btn-greenway-details w-100">
+                                        Ver Detalles
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="event-card">
-                        <div class="event-card-image">
-                            <img src="https://res.cloudinary.com/worldpackers/image/upload/c_limit,f_auto,q_auto,w_1140/nhci0jfck8tf9ks8icyt" alt="Evento 3">
+                    
+                    {% else %}
+                        <!-- Esto se muestra si no hay NINGÚN hospedaje en la DB -->
+                        <div class="col-12 text-center">
+                            <p class="fs-5 text-muted">Aún no hay alojamientos registrados. ¡Vuelve pronto!</p>
                         </div>
-                        <div class="event-card-content">
-                            <h5>Reserva Natural La Ceja</h5>
-                            <p class="price">Desde 123.456 $ por persona</p>
-                            <div class="event-card-rating">
-                                <div class="rating-stats">
-                                    Puntaje &nbsp; • &nbsp; Reseñas<br>
-                                    <strong>3.5</strong> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <strong>1500</strong>
-                                </div>
-                                <div class="rating-stars">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                    <i class="bi bi-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div> 
+                    
+                    {% endfor %}
+                    
+                </div> <!-- Fin del .carousel-track -->
+            </div> <!-- Fin del .carousel-container -->
+            
         </div> 
     </section>
 {% endblock %}
 
+
+<!-- 5. Definimos el bloque de scripts (solo los de esta página) -->
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // --- SCRIPT DEL SLIDER DEL HERO ---
+        // --- SCRIPT DEL SLIDER DEL HERO (Sin cambios) ---
         const heroImages = [
             'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
             'https://wallpapercave.com/wp/wp13667471.jpg',
@@ -226,23 +225,7 @@
             setInterval(changeHeroBackground, 6000);
         }
 
-        // --- SCRIPT PARA FONDO INTERACTIVO DE EVENTOS ---
-        const sectionBg = document.getElementById('section-bg-image');
-        const eventCards = document.querySelectorAll('.event-card');
-
-        eventCards.forEach(card => {
-            const img = card.querySelector('.event-card-image img');
-            const imageUrl = img.getAttribute('src');
-
-            card.addEventListener('mouseenter', () => {
-                sectionBg.style.backgroundImage = `url(${imageUrl})`;
-                sectionBg.style.opacity = 1;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                sectionBg.style.opacity = 0;
-            });
-        });
+        // --- Script de fondo interactivo (eliminado, ya no es necesario) ---
 
     }); // Fin del DOMContentLoaded
 </script>
