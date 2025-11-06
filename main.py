@@ -1,13 +1,7 @@
 import sys
 import os
 from functools import wraps
-# Asegúrate de que todas las importaciones de Flask estén aquí
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify 
-
-# --- Añadir el proyecto raíz al path ---
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, project_root)
-# -----------------------------------------------------------------
 
 # SDKs de Firebase (Cliente y Admin)
 from data.firebase_config import auth, db
@@ -26,7 +20,7 @@ except Exception as e:
     chatbot_importado = False
 # -----------------------------------------------
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/templates')
 app.secret_key = "clave_secreta" 
 
 # --- Inicializa el chatbot ---
