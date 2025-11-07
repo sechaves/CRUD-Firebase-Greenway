@@ -12,7 +12,7 @@ DATABASE_URL = 'https://greenway-450aa-default-rtdb.firebaseio.com'
 #    os.path.dirname(...)       -> Obtiene la carpeta que lo contiene ('data/')
 #    os.path.join(...)          -> Une 'data/' + 'serviceAccountKey.json'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CRED_PATH = os.path.join(BASE_DIR, 'serviceAccountKey.json')
+CRED_PATH = os.path.join(BASE_DIR, '..', 'serviceAccountKey.json')
 
 # --- Fin Configuración ---
 
