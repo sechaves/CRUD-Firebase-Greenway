@@ -33,7 +33,7 @@
                         Este formulario envía los datos a la ruta '/crear-experiencia-submit'
                         que creamos en main.py
                     -->
-                    <form action="{{ url_for('crear_experiencia_submit') }}" method="POST">
+                    <form method="POST" action="{{ url_for('crear_experiencia_submit') }}" enctype="multipart/form-data">
                         
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre de la experiencia</label>
@@ -53,15 +53,10 @@
                             </div>
                         </div>
 
-                        <!-- 
-                            Próximamente (Tarea 6: Fotos de Majo)
-                            Aquí añadiríamos el input para subir la foto
                         <div class="mb-3">
-                            <label for="foto" class="form-label">Foto Principal</label>
-                            <input type="file" class="form-control" id="foto" name="foto" disabled>
+                            <label for="imagen" class="form-label">Foto de Portada</label>
+                            <input class="form-control" type="file" id="imagen" name="imagen" accept="image/*" required>
                         </div>
-                        -->
-
                         <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Registrar Experiencia</button>
 
                     </form>
