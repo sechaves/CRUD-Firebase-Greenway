@@ -57,9 +57,16 @@
                 <span class="text-muted">/ por noche</span>
             </div>
 
-            <button class="btn btn-reservar w-100" disabled>
-                Reservar (Próximamente)
-            </button>
+            {% set wpp_number = '573128036725' %}
+
+            {% set wpp_message = "Hola, estoy interesado en reservar la experiencia: " ~ experiencia.nombre %}
+
+
+            <a href="https://wa.me/{{ wpp_number }}?text={{ wpp_message|urlencode }}" 
+            target="_blank" 
+            class="btn btn-reservar w-100">
+            <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
+            </a>
         </div>
     </div>
     {% else %}

@@ -153,21 +153,21 @@
                     <!-- 
                         Iteramos sobre los 'hospedajes' que pasamos desde main.py
                     -->
-                    {% for lugar in experiencias %}
+                    {% for experiencia in experiencias %}
                         <div class="carousel-card"> <!-- Tarjeta individual del carrusel -->
                             <div class="event-card w-100"> <!-- Usamos el estilo 'event-card' -->
                                 <div class="event-card-image">
-                                    <img src="{{ lugar.imagen_url }}" alt="{{ lugar.nombre }}">
+                                    <img src="{{ experiencia.imagen_url }}" alt="{{ experiencia.nombre }}">
                                 </div>
                                 <div class="event-card-content">
-                                    <h5>{{ lugar.nombre }}</h5>
-                                    <p class="price">Desde {{ "${:,.0f}".format(lugar.precio_noche) }} COP / noche</p>
+                                    <h5>{{ experiencia.nombre }}</h5>
+                                    <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP / noche</p>
                                     <p class="text-muted">
-                                        {{ lugar.descripcion | truncate(100) }}
+                                        {{ experiencia.descripcion | truncate(100) }}
                                     </p>
                                 </div>
                                 <div class="card-footer-custom">
-                                    <a href="{{ url_for('lugar_detalle', lugar_id=lugar.id) }}" class="btn btn-greenway-details w-100">
+                                    <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
                                         Ver Detalles
                                     </a>
                                 </div>
