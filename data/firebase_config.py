@@ -10,7 +10,10 @@ firebaseConfig = {
     "appId": "1:107049448583:web:2f8a6eece8d2e21d913422"
 }
 
+# 1. Llamamos a la app "firebase"
 firebase = pyrebase.initialize_app(firebaseConfig)
 
+# 2. Usamos "firebase" para crear los servicios
 auth = firebase.auth()
 db = firebase.database()
+storage = firebase.storage() # <-- ¡¡¡ARREGLADO!!! (Usa "firebase.")
