@@ -2,7 +2,7 @@ import sys
 import os
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify 
-from data.firebase_config import auth, db, storage
+from data.firebase_config import auth, db
 from data.firebase_admin import admin_auth
 from domain.models import Usuario, Propietaria, Admin, Persona
 try:
@@ -373,47 +373,27 @@ def crear_experiencia_submit():
         descripcion = request.form['descripcion']
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
-        
-        # 2. Obtenemos el archivo de la imagen
-        # "imagen" debe coincidir con el 'name' del input en el HTML
-        if 'imagen' not in request.files:
-            flash('No se encontró el archivo de imagen.', 'danger')
-            return redirect(url_for('crear_experiencia_form'))
-            
-        file = request.files['imagen']
-        
-        if file.filename == '':
-            flash('No se seleccionó ningún archivo.', 'danger')
-            return redirect(url_for('crear_experiencia_form'))
 
-        # 3. Subimos la foto a Firebase Storage
-        # Creamos un path único (ej: "experiencias/ID_DEL_USER/nombre_archivo.jpg")
-        path_in_storage = f"experiencias/{propietario_id}/{file.filename}"
-        
-        # ¡La acción de subir!
-        # (Usamos 'file' directamente, Pyrebase es inteligente)
-        storage.child(path_in_storage).put(file)
-        
-        # 4. Obtenemos la URL pública de esa foto
-        imagen_url = storage.child(path_in_storage).get_url()
+        # 2. ¡NUEVO! Leemos el link que el usuario pegó
+        imagen_url = request.form['imagen_url']
 
-        # 5. Guardamos la URL (no la foto) en la Realtime Database
+        # 3. Guardamos los datos (incluyendo el link) en la DB
         experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
             'precio_noche': int(precio_noche),
             'propietario_id': propietario_id,
-            'imagen_url': imagen_url  # <-- ¡La URL de Firebase Storage!
+            'imagen_url': imagen_url  # <-- ¡Usamos el link de Imgur!
         }
-        
+
         nuevo_experiencia = db.child("experiencias").push(experiencia_data)
-        
+
         flash('¡Experiencia registrada con éxito!', 'success')
         return redirect(url_for('experiencia_detalle', experiencia_id=nuevo_experiencia['name']))
-        
+
     except Exception as e:
         flash(f'Error al crear la experiencia: {e}', 'danger')
-        print(f"Error detallado: {e}") # Para depurar en Render
+        print(f"Error detallado: {e}") 
         return redirect(url_for('crear_experiencia_form'))
 
 

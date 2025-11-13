@@ -16,4 +16,3 @@ firebase = pyrebase.initialize_app(firebaseConfig)
 # 2. Usamos "firebase" para crear los servicios
 auth = firebase.auth()
 db = firebase.database()
-storage = firebase.storage() # <-- ¡¡¡ARREGLADO!!! (Usa "firebase.")
