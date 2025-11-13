@@ -197,13 +197,11 @@
         
         // --- SCRIPT DEL SLIDER DEL HERO (Sin cambios) ---
         const heroImages = [
-            'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
-            'https://wallpapercave.com/wp/wp13667471.jpg',
-            'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
-            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
-            'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
-            'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
-        ]; 
+        "{{ url_for('static', filename='images/Mariposa.jpg') }}",
+        "{{ url_for('static', filename='images/Apicultores.jpg') }}",
+        "{{ url_for('static', filename='images/Apiario.jpg') }}",
+        "{{ url_for('static', filename='images/Portada-Mariposario.jpg') }}"
+    ];
 
         const slides = document.querySelectorAll('.hero-slide');
         let currentSlide = 0;
