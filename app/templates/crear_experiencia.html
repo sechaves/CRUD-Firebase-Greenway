@@ -1,46 +1,27 @@
-<!-- Hereda de la plantilla base -->
 {% extends "base.html" %}
-
-<!-- Define el título de la página -->
 {% block title %}Registrar Experiencia{% endblock %}
 
-{% block styles %}
-<style>
-    .card-header { 
-        background-color: var(--greenway-primary); 
-        color: white; 
-        font-weight: 700; 
-    }
-</style>
-{% endblock %}
-
-
-<!-- Define el contenido de la página -->
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-lg-8">
+            <h2 class="mb-4">Registrar Nueva Experiencia</h2>
             
-            <h1 class="mb-4">Registrar Nueva Experiencia</h1>
-
-            <!-- Formulario para crear el experiencia -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    Detalles de la experiencia
-                </div>
-                <div class="card-body p-4">
-                    <!-- 
-                        Este formulario envía los datos a la ruta '/crear-experiencia-submit'
-                        que creamos en main.py
-                    -->
-                    <div class="mb-3">
-                        <label for="imagen_url" class="form-label">Link (URL) de la Foto</label>
-                        <input type="text" class="form-control" id="imagen_url" name="imagen_url" 
-                            placeholder="Ej: https://i.imgur.com/mi-foto.jpg" required>
-                        <div class="form-text">
-                            Sube tu foto a <a href="https://imgur.com/upload" target="_blank">Imgur</a> y pega el "Direct Link" (o Link) aquí.
-                        </div>
+            <form method="POST" action="{{ url_for('crear_experiencia_submit') }}">
+                <div class="card shadow-sm">
+                    <div class="card-header" style="background-color: var(--greenway-primary); color: white; font-weight: 600;">
+                        Detalles de la experiencia
                     </div>
+                    <div class="card-body p-4">
+
+                        <div class="mb-3">
+                            <label for="imagen_url" class="form-label">Link (URL) de la Foto</label>
+                            <input type="text" class="form-control" id="imagen_url" name="imagen_url" 
+                                   placeholder="Ej: https://i.imgur.com/mi-foto.jpg" required>
+                            <div class="form-text">
+                                Sube tu foto a <a href="https://imgur.com/upload" target="_blank">Imgur</a> y pega el "Direct Link" (o Link) aquí.
+                            </div>
+                        </div>
                         
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre de la experiencia</label>
@@ -49,29 +30,23 @@
 
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción Corta</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio por persona (en COP, sin puntos)</label>
+                            <input type="number" class="form-control" id="precio" name="precio" 
+                                   placeholder="Ej: 150000" required>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="precio" class="form-label">Precio por persona(en COP, sin puntos):</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="precio" name="precio" placeholder="Ej: 150000" required>
-                            </div>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100" style="background-color: var(--greenway-primary); border: none; font-weight: 600;">
+                            Registrar Experiencia
+                        </button>
 
-                        <div class="mb-3">
-                            <label for="imagen" class="form-label">Foto de Portada</label>
-                            <input class="form-control" type="file" id="imagen" name="imagen" accept="image/*" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Registrar Experiencia</button>
-
-                    </form>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
+                    </div> 
+                </div> 
+            </form> 
+        </div> 
+    </div> 
+</div> 
 {% endblock %}
-
