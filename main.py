@@ -2,12 +2,8 @@ import sys
 import os
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify 
-
-# SDKs de Firebase (Cliente y Admin)
 from data.firebase_config import auth, db
 from data.firebase_admin import admin_auth
-
-# --- Importa el Model (POO) y el Chatbot (POO) ---
 from domain.models import Usuario, Propietaria, Admin, Persona
 try:
     from domain.openai_chatbot import GreenwayChatbot
@@ -18,12 +14,9 @@ except ImportError:
 except Exception as e:
     print(f"Advertencia: Error al importar chatbot: {e}. El bot estará desactivado.")
     chatbot_importado = False
-# -----------------------------------------------
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.secret_key = "clave_secreta" 
-
-# --- Inicializa el chatbot ---
 chatbot = None
 if chatbot_importado:
     try:
@@ -33,21 +26,13 @@ if chatbot_importado:
         print(f"Error al inicializar el chatbot: {e}")
     except Exception as e:
         print(f"Error inesperado al inicializar el chatbot: {e}")
-# -------------------------------------------------------------------
 
-# =================================================================
-# FUNCIÓN ANTI-CACHÉ
-# =================================================================
 @app.after_request
 def prevent_caching(response: Response) -> Response:
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-
-# =================================================================
-# DECORADORES DE AUTENTICACIÓN
-# =================================================================
 
 def login_required(f):
     @wraps(f)
@@ -73,20 +58,14 @@ def role_required(role_name):
             if 'role' not in session:
                 flash('No tienes permiso para ver esta página.', 'danger')
                 return redirect(url_for('home'))
-            
             if session['role'] == 'admin':
                 return f(*args, **kwargs) # Admin puede ver todo
-
             if session['role'] != role_name:
                 flash(f'Esta página es solo para rol: {role_name}.', 'danger')
                 return redirect(url_for('home'))
             return f(*args, **kwargs)
         return wrapper_role
     return decorator
-
-# =================================================================
-# RUTAS DE AUTENTICACIÓN (PÁGINAS "DE AFUERA")
-# =================================================================
 
 @app.route('/')
 @anonymous_required
@@ -101,50 +80,31 @@ def register():
 @app.route('/signup', methods=['POST'])
 @anonymous_required
 def signup():
-    """
-    Ruta de registro actualizada con lógica POO.
-    Lee el botón de radio y crea la instancia de clase correcta.
-    """
     email = request.form['email']
     password = request.form['password']
     nombre = request.form['nombre']
-    # ¡NUEVO! Lee el rol del botón de radio
     rol_elegido = request.form.get('rol') # 'usuario' o 'propietaria'
-
     if not rol_elegido:
         flash('Debes seleccionar un tipo de cuenta.', 'danger')
         return redirect(url_for('register'))
-
     try:
-        # 1. Crear usuario en Firebase Authentication (común para todos)
         user_auth_data = auth.create_user_with_email_and_password(email, password)
         user_id = user_auth_data['localId']
-        
-        # 2. Lógica POO: Instanciar la clase correcta
         nuevo_usuario = None
         if rol_elegido == 'usuario':
             nuevo_usuario = Usuario(user_id, nombre, email)
         elif rol_elegido == 'propietaria':
             nuevo_usuario = Propietaria(user_id, nombre, email)
-        
         if nuevo_usuario:
-            # 3. Guardar en el nodo correcto de la DB (usuarios/ o propietarios/)
             nuevo_usuario.save_to_db(db)
-            
-            # 4. Asignar el Custom Claim (Rol) para la seguridad
             if admin_auth:
                 admin_auth.set_custom_user_claims(user_id, {'role': nuevo_usuario.rol})
-        
-        # 5. Iniciar sesión automáticamente
         user_session = auth.sign_in_with_email_and_password(email, password)
         session['user_email'] = user_session['email']
         session['user_id'] = user_session['localId']
-        session['role'] = nuevo_usuario.rol # Asigna el rol elegido a la sesión
-        
-        # 6. Notificación de éxito
+        session['role'] = nuevo_usuario.rol 
         flash(f'¡Bienvenido, {nombre}! Tu cuenta de {nuevo_usuario.rol} ha sido creada.', 'success')
         return redirect(url_for('home'))
-
     except Exception as e:
         error_message = str(e)
         if "EMAIL_EXISTS" in error_message:
@@ -154,7 +114,6 @@ def signup():
         else:
             flash(f'Error al crear la cuenta: {e}', 'danger')
         return redirect(url_for('register'))
-
 
 @app.route('/signin', methods=['POST'])
 @anonymous_required
@@ -177,7 +136,6 @@ def signin():
     except Exception as e:
         flash('Credenciales incorrectas. Por favor, inténtalo de nuevo.', 'danger')
         return redirect(url_for('login'))
-
 
 @app.route('/logout')
 def logout():
@@ -202,10 +160,6 @@ def reset_password_request():
         flash('Error al enviar el correo. ¿Email correcto?', 'danger')
         return redirect(url_for('reset_password'))
 
-# =================================================================
-# RUTAS DE APLICACIÓN (PÁGINAS "DE ADENTRO")
-# =================================================================
-
 @app.route('/home')
 @login_required
 def home():
@@ -216,7 +170,6 @@ def home():
             for experiencia_id, experiencia_info in all_experiencias_data.items():
                 experiencia_info['id'] = experiencia_id
                 experiencias_list.append(experiencia_info)
-        
         return render_template('home.html', session=session, experiencias=experiencias_list)
     except Exception as e:
         print(f"Error cargando experiencias para home: {e}")
@@ -232,7 +185,6 @@ def experiencias():
             for experiencia_id, experiencia_info in all_experiencias_data.items():
                 experiencia_info['id'] = experiencia_id
                 experiencias_list.append(experiencia_info)
-        
         return render_template('experiencias.html', session=session, experiencias=experiencias_list)
     except Exception as e:
         flash(f'Error al cargar las experiencias: {e}', 'danger')
@@ -241,24 +193,14 @@ def experiencias():
 @app.route('/profile')
 @login_required
 def profile():
-    """
-    Ruta de perfil actualizada con lógica POO.
-    Busca al usuario en el nodo correcto ('usuarios', 'propietarios', 'admins')
-    usando el rol guardado en la sesión.
-    """
     try:
         user_id = session['user_id']
         user_rol = session['role']
-        
-        # Usamos la clase Persona para encontrar al usuario en el nodo correcto
         user_data = Persona.get_user_data_by_role(db, user_rol, user_id)
-        
         if not user_data:
             flash('No se pudieron cargar los datos del usuario.', 'danger')
             return redirect(url_for('home'))
-                
-        return render_template('profile.html', user=user_data, session=session)
-    
+        return render_template('profile.html', user=user_data, session=session)    
     except Exception as e:
         flash(f'Error al cargar perfil: {e}', 'danger')
         return redirect(url_for('home'))
@@ -268,92 +210,158 @@ def profile():
 def settings():
     return redirect(url_for('profile'))
 
-
 @app.route('/update-profile', methods=['POST'])
 @login_required
 def update_profile():
-    """
-    Actualiza el perfil del usuario en el nodo correcto.
-    """
     try:
         user_id = session['user_id']
         user_rol = session['role']
         nuevo_nombre = request.form['nombre']
-        
         if not nuevo_nombre or len(nuevo_nombre.strip()) == 0:
             flash('El nombre no puede estar vacío.', 'danger')
             return redirect(url_for('profile'))
-
-        # Lógica POO: Usamos el método estático para saber dónde guardar
         nodo_db = Persona.get_db_node_by_role(user_rol)
         db.child(nodo_db).child(user_id).update({"nombre": nuevo_nombre.strip()})
-        
         flash('Tu nombre ha sido actualizado con éxito.', 'success')
     except Exception as e:
         flash(f'Error al actualizar el perfil: {e}', 'danger')
-    
     return redirect(url_for('profile'))
-
 
 @app.route('/delete-account', methods=['POST'])
 @login_required
 def delete_account():
-    """
-    Elimina al usuario de Auth y de su nodo correspondiente en la DB.
-    """
     try:
         user_id = session['user_id']
         user_rol = session['role']
-        
-        # 1. Eliminar de Firebase Authentication (SDK Admin)
         admin_auth.delete_user(user_id)
-        
-        # 2. Eliminar del nodo correcto en Realtime Database (POO)
         nodo_db = Persona.get_db_node_by_role(user_rol)
         db.child(nodo_db).child(user_id).remove()
-        
-        # 3. Limpiar la sesión (hacer logout)
         session.clear()
-        
         flash('Tu cuenta ha sido eliminada permanentemente.', 'success')
         return redirect(url_for('login'))
-        
     except Exception as e:
         flash(f'Error al eliminar tu cuenta: {e}', 'danger')
         return redirect(url_for('profile'))
-
-
-# --- Rutas de Admin y Propietario ---
 
 @app.route('/admin-panel')
 @login_required
 @role_required('admin')
 def admin_panel():
-    """
-    Ruta de admin actualizada con lógica POO.
-    Trae los datos de los 3 nodos separados.
-    """
     try:
         all_admins = db.child("admins").get().val() or {}
         all_propietarios = db.child("propietarios").get().val() or {}
         all_usuarios = db.child("usuarios").get().val() or {}
-        
+        all_experiencias = db.child("experiencias").get().val() or {} 
         return render_template('admin_panel.html', 
-                               session=session, 
-                               admins=all_admins,
-                               propietarios=all_propietarios,
-                               usuarios=all_usuarios)
+                                 session=session, 
+                                 admins=all_admins,
+                                 propietarios=all_propietarios,
+                                 usuarios=all_usuarios,
+                                 experiencias=all_experiencias)
     except Exception as e:
         flash(f'Error al cargar el panel de admin: {e}', 'danger')
         return redirect(url_for('home'))
 
+@app.route('/admin/delete-experiencia/<experiencia_id>', methods=['POST'])
+@login_required
+def admin_delete_experiencia(experiencia_id):
+    """
+    Elimina una experiencia.
+    Permitido si:
+    1. Eres admin.
+    2. Eres el propietario de esta experiencia.
+    """
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            flash('Esa experiencia no existe.', 'danger')
+            return redirect(url_for('home'))
+
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+        if not (is_owner or is_admin):
+            flash('No tienes permiso para eliminar esta experiencia.', 'danger')
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+        db.child("experiencias").child(experiencia_id).remove()
+        flash('Experiencia eliminada con éxito.', 'success')
+    except Exception as e:
+        flash(f'Error al eliminar la experiencia: {e}', 'danger')
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin_panel'))
+    else:
+        return redirect(url_for('home'))
+
+@app.route('/admin/edit-experiencia/<experiencia_id>')
+@login_required
+def admin_edit_experiencia(experiencia_id):
+    """
+    Muestra el formulario para editar una experiencia.
+    Permitido si:
+    1. Eres admin.
+    2. Eres el propietario de esta experiencia.
+    """
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            flash('No se encontró esa experiencia.', 'danger')
+            return redirect(url_for('home'))
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+        if not (is_owner or is_admin):
+            flash('No tienes permiso para editar esta experiencia.', 'danger')
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+        return render_template('admin_edit_experiencia.html', 
+                               session=session,
+                               experiencia=experiencia_data, 
+                               exp_id=experiencia_id)
+    except Exception as e:
+        flash(f'Error al cargar la experiencia: {e}', 'danger')
+        return redirect(url_for('admin_panel'))
+
+@app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
+@login_required
+def admin_update_experiencia(experiencia_id):
+    """
+    Guarda los cambios de la edición.
+    Permitido si:
+    1. Eres admin.
+    2. Eres el propietario de esta experiencia.
+    """
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            flash('Esa experiencia no existe.', 'danger')
+            return redirect(url_for('home'))
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+        if not (is_owner or is_admin):
+            flash('No tienes permiso para modificar esta experiencia.', 'danger')
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+        nuevo_nombre = request.form['nombre']
+        nueva_desc = request.form['descripcion']
+        nuevo_precio = int(request.form['precio'])
+        update_data = {
+            'nombre': nuevo_nombre,
+            'descripcion': nueva_desc,
+            'precio_noche': nuevo_precio
+        }
+        db.child("experiencias").child(experiencia_id).update(update_data)
+        flash('Experiencia actualizada con éxito.', 'success')
+    except Exception as e:
+        flash(f'Error al actualizar la experiencia: {e}', 'danger')
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin_panel'))
+    else:
+        return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
 
 @app.route('/crear-experiencia')
 @login_required
 @role_required('propietaria')
 def crear_experiencia_form():
     return render_template('crear_experiencia.html', session=session)
-
 
 @app.route('/crear-experiencia-submit', methods=['POST'])
 @login_required
@@ -364,9 +372,7 @@ def crear_experiencia_submit():
         descripcion = request.form['descripcion']
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
-        
         placeholder_img = "https://cf.bstatic.com/xdata/images/hotel/max1024x768/658391731.jpg?k=8a8c5a5fe9ce371b31ecbf4e8db05f2a3d1fde897d80338c9e8a758980d8521d&o=&hp=1"
-
         experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
@@ -374,12 +380,9 @@ def crear_experiencia_submit():
             'propietario_id': propietario_id,
             'imagen_url': placeholder_img
         }
-        
         nuevo_experiencia = db.child("experiencias").push(experiencia_data)
-        
         flash('¡experiencia registrado con éxito!', 'success')
-        return redirect(url_for('experiencia_detalle', experiencia_id=nuevo_experiencia['name']))
-        
+        return redirect(url_for('experiencia_detalle', experiencia_id=nuevo_experiencia['name']))  
     except Exception as e:
         flash(f'Error al crear el experiencia: {e}', 'danger')
         return redirect(url_for('crear_experiencia_form'))
@@ -392,19 +395,17 @@ def experiencia_detalle(experiencia_id):
         experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
         
         if not experiencia_data:
-            flash('Ese experiencia no existe.', 'danger')
+            flash('Esa experiencia no existe.', 'danger')
             return redirect(url_for('home'))
-            
-        return render_template('experiencia_detalle.html', session=session, experiencia=experiencia_data)
+        return render_template('experiencia_detalle.html', 
+                               session=session, 
+                               experiencia=experiencia_data,
+                               experiencia_id=experiencia_id) 
         
     except Exception as e:
         flash(f'Error al cargar el experiencia: {e}', 'danger')
         return redirect(url_for('home'))
-
-# =================================================================
-# RUTA DEL CHATBOT
-# =================================================================
-
+    
 @app.route('/ask-chatbot', methods=['POST'])
 @login_required
 def ask_chatbot():
@@ -425,12 +426,7 @@ def ask_chatbot():
         print(f"Error en el chatbot: {e}")
         return jsonify({'error': 'Error interno al procesar tu pregunta.'}), 500
 
-# =================================================================
-# INICIO DE LA APP
-# =================================================================
-
 if __name__ == '__main__':
-    # Verificaciones de arranque
     if admin_auth is None:
         print("Error crítico: No se pudo inicializar el SDK de Admin (serviceAccountKey.json).")
     elif chatbot is None and chatbot_importado:
@@ -442,4 +438,3 @@ if __name__ == '__main__':
         print("*** Servidor Flask v3.0 (POO) LISTO ***")
         print("************************************")
         app.run(debug=True, port=5000)
-

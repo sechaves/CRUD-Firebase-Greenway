@@ -1,7 +1,5 @@
-<!-- Hereda de la plantilla base -->
 {% extends "base.html" %}
 
-<!-- El título será el nombre del experiencia -->
 {% block title %}{{ experiencia.nombre }}{% endblock %}
 
 {% block styles %}
@@ -26,25 +24,29 @@
         padding: 12px 25px;
         font-size: 1.1rem;
     }
+    .btn-reservar:hover {
+        background-color: #27a33e; /* Un verde más oscuro para el hover */
+        color: white;
+    }
 </style>
 {% endblock %}
 
 
-<!-- Define el contenido de la página -->
 {% block content %}
 <div class="container my-5">
     
     {% if experiencia %}
     <div class="row">
-        <!-- Columna de la Imagen -->
         <div class="col-lg-7 mb-4">
             <img src="{{ experiencia.imagen_url }}" class="experiencia-imagen" alt="{{ experiencia.nombre }}">
         </div>
 
-        <!-- Columna de Detalles y Reserva -->
         <div class="col-lg-5">
             <h1 class="display-5 fw-bold">{{ experiencia.nombre }}</h1>
-            <p class="lead text-muted">Registrado por: {{ experiencia.nombre_propietario }}</p>
+            
+            {% if experiencia.nombre_propietario %}
+                <p class="lead text-muted">Registrado por: {{ experiencia.nombre_propietario }}</p>
+            {% endif %}
             
             <hr class="my-4">
 
@@ -57,17 +59,40 @@
                 <span class="text-muted">/ por noche</span>
             </div>
 
-            {% set wpp_number = '573128036725' %}
-
+            {% set wpp_number = '573001234567' %}
             {% set wpp_message = "Hola, estoy interesado en reservar la experiencia: " ~ experiencia.nombre %}
-
-
+            
             <a href="https://wa.me/{{ wpp_number }}?text={{ wpp_message|urlencode }}" 
-            target="_blank" 
-            class="btn btn-reservar w-100">
-            <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
+               target="_blank" 
+               class="btn btn-reservar w-100">
+                <i class="fab fa-whatsapp"></i> Reservar por WhatsApp
             </a>
-        </div>
+            
+            
+            {% if session['role'] == 'admin' or (experiencia.propietario_id == session['user_id']) %}
+
+                <hr class="my-4">
+                <h5 class="text-muted">Panel de Propietario</h5>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_edit_experiencia', experiencia_id=experiencia_id) }}" 
+                       class="btn btn-outline-primary">
+                        Editar esta Experiencia
+                    </a>
+                    
+                    <form action="{{ url_for('admin_delete_experiencia', experiencia_id=experiencia_id) }}" 
+                          method="POST" 
+                          class="d-grid"
+                          onsubmit="return confirm('¿Estás seguro de que quieres ELIMINAR esta experiencia? Esta acción no se puede deshacer.');">
+                        
+                        <button type="submit" class="btn btn-outline-danger">
+                            Eliminar esta Experiencia
+                        </button>
+                    </form>
+                </div>
+                
+            {% endif %}
+            </div>
     </div>
     {% else %}
     <div class="text-center">
@@ -79,4 +104,3 @@
 
 </div>
 {% endblock %}
-
