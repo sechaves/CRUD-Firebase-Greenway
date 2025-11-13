@@ -20,7 +20,7 @@ except Exception as e:
     chatbot_importado = False
 # -----------------------------------------------
 
-app = Flask(__name__, template_folder='app/templates')
+app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.secret_key = "clave_secreta" 
 
 # --- Inicializa el chatbot ---
