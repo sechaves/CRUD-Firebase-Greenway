@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 
 <!-- Define el título de la página -->
-{% block title %}Registrar Hospedaje{% endblock %}
+{% block title %}Registrar Experiencia{% endblock %}
 
 {% block styles %}
 <style>
@@ -21,12 +21,12 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             
-            <h1 class="mb-4">Registrar Nuevo Hospedaje</h1>
+            <h1 class="mb-4">Registrar Nueva Experiencia</h1>
 
             <!-- Formulario para crear el lugar -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
-                    Detalles del Lugar
+                    Detalles de la experiencia
                 </div>
                 <div class="card-body p-4">
                     <!-- 
@@ -36,7 +36,7 @@
                     <form action="{{ url_for('crear_lugar_submit') }}" method="POST">
                         
                         <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre del Lugar</label>
+                            <label for="nombre" class="form-label">Nombre de la experiencia</label>
                             <input type="text" class="form-control" id="nombre" name="nombre" required>
                         </div>
 
@@ -46,7 +46,7 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="precio" class="form-label">Precio por Noche (en COP, sin puntos)</label>
+                            <label for="precio" class="form-label">Precio por persona(en COP, sin puntos):</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="precio" name="precio" placeholder="Ej: 150000" required>
@@ -62,7 +62,7 @@
                         </div>
                         -->
 
-                        <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Registrar Lugar</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Registrar Experiencia</button>
 
                     </form>
                 </div>

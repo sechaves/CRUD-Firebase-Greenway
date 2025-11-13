@@ -141,8 +141,8 @@
             <!-- Títulos cambiados -->
             <div class="row text-center">
                 <div class="col-12">
-                    <h2 class="section-title">ALOJAMIENTOS DESTACADOS</h2>
-                    <p class="section-subtitle">Descubre los lugares únicos registrados por nuestr@s propietari@s.</p>
+                    <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
+                    <p class="section-subtitle">Descubre las experiencias únicas registradas por nuestr@s propietari@s.</p>
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
                     <!-- 
                         Iteramos sobre los 'hospedajes' que pasamos desde main.py
                     -->
-                    {% for lugar in hospedajes %}
+                    {% for lugar in experiencias %}
                         <div class="carousel-card"> <!-- Tarjeta individual del carrusel -->
                             <div class="event-card w-100"> <!-- Usamos el estilo 'event-card' -->
                                 <div class="event-card-image">
@@ -177,7 +177,7 @@
                     {% else %}
                         <!-- Esto se muestra si no hay NINGÚN hospedaje en la DB -->
                         <div class="col-12 text-center">
-                            <p class="fs-5 text-muted">Aún no hay alojamientos registrados. ¡Vuelve pronto!</p>
+                            <p class="fs-5 text-muted">Aún no hay experiencias registradas. ¡Vuelve pronto!</p>
                         </div>
                     
                     {% endfor %}

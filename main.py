@@ -210,32 +210,32 @@ def reset_password_request():
 @login_required
 def home():
     try:
-        all_hospedajes_data = db.child("hospedajes").get().val()
-        hospedajes_list = []
-        if all_hospedajes_data:
-            for lugar_id, lugar_info in all_hospedajes_data.items():
+        all_experiencias_data = db.child("experiencias").get().val()
+        experiencias_list = []
+        if all_experiencias_data:
+            for lugar_id, lugar_info in all_experiencias_data.items():
                 lugar_info['id'] = lugar_id
-                hospedajes_list.append(lugar_info)
+                experiencias_list.append(lugar_info)
         
-        return render_template('home.html', session=session, hospedajes=hospedajes_list)
+        return render_template('home.html', session=session, experiencias=experiencias_list)
     except Exception as e:
-        print(f"Error cargando hospedajes para home: {e}")
-        return render_template('home.html', session=session, hospedajes=[])
+        print(f"Error cargando experiencias para home: {e}")
+        return render_template('home.html', session=session, experiencias=[])
 
-@app.route('/alojamientos')
+@app.route('/experiencias')
 @login_required
-def alojamientos():
+def experiencias():
     try:
-        all_hospedajes_data = db.child("hospedajes").get().val()
-        hospedajes_list = []
-        if all_hospedajes_data:
-            for lugar_id, lugar_info in all_hospedajes_data.items():
+        all_experiencias_data = db.child("experiencias").get().val()
+        experiencias_list = []
+        if all_experiencias_data:
+            for lugar_id, lugar_info in all_experiencias_data.items():
                 lugar_info['id'] = lugar_id
-                hospedajes_list.append(lugar_info)
+                experiencias_list.append(lugar_info)
         
-        return render_template('alojamientos.html', session=session, hospedajes=hospedajes_list)
+        return render_template('experiencias.html', session=session, experiencias=experiencias_list)
     except Exception as e:
-        flash(f'Error al cargar los alojamientos: {e}', 'danger')
+        flash(f'Error al cargar las experiencias: {e}', 'danger')
         return redirect(url_for('home'))
     
 @app.route('/profile')
@@ -375,7 +375,7 @@ def crear_lugar_submit():
             'imagen_url': placeholder_img
         }
         
-        nuevo_lugar = db.child("hospedajes").push(lugar_data)
+        nuevo_lugar = db.child("experiencias").push(lugar_data)
         
         flash('¡Lugar registrado con éxito!', 'success')
         return redirect(url_for('lugar_detalle', lugar_id=nuevo_lugar['name']))
@@ -389,7 +389,7 @@ def crear_lugar_submit():
 @login_required
 def lugar_detalle(lugar_id):
     try:
-        lugar_data = db.child("hospedajes").child(lugar_id).get().val()
+        lugar_data = db.child("experiencias").child(lugar_id).get().val()
         
         if not lugar_data:
             flash('Ese lugar no existe.', 'danger')
