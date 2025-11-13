@@ -23,10 +23,20 @@
                               rows="5" required>{{ experiencia.descripcion }}</textarea>
                 </div>
 
+
                 <div class="mb-3">
                     <label for="precio" class="form-label">Precio por Noche (COP)</label>
                     <input type="number" class="form-control" id="precio" name="precio" 
                            value="{{ experiencia.precio_noche }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="imagen_url" class="form-label">Link (URL) de la Foto</label>
+                    <input type="text" class="form-control" id="imagen_url" name="imagen_url" 
+                        value="{{ experiencia.imagen_url }}" required>
+                    <div class="form-text">
+                        Pega el "Enlace directo" de <a href="https://postimages.org/" target="_blank">Postimages.org</a>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn btn-success">Guardar Cambios</button>

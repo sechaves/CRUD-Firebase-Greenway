@@ -322,6 +322,7 @@ def admin_edit_experiencia(experiencia_id):
 
 @app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
 @login_required
+# Se quitó @role_required('admin') para añadir la lógica abajo
 def admin_update_experiencia(experiencia_id):
     """
     Guarda los cambios de la edición.
@@ -330,33 +331,49 @@ def admin_update_experiencia(experiencia_id):
     2. Eres el propietario de esta experiencia.
     """
     try:
+        # --- LÓGICA DE PERMISO (Sin cambios) ---
         experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
         if not experiencia_data:
             flash('Esa experiencia no existe.', 'danger')
             return redirect(url_for('home'))
+
         owner_id = experiencia_data.get('propietario_id')
         is_owner = (owner_id == session['user_id'])
         is_admin = (session.get('role') == 'admin')
+
         if not (is_owner or is_admin):
             flash('No tienes permiso para modificar esta experiencia.', 'danger')
             return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+        # --- FIN DE LÓGICA DE PERMISO ---
+
+        # --- ¡¡¡SECCIÓN ACTUALIZADA!!! ---
+        # Saca los datos del formulario
         nuevo_nombre = request.form['nombre']
         nueva_desc = request.form['descripcion']
         nuevo_precio = int(request.form['precio'])
+        nueva_imagen_url = request.form['imagen_url'] # <-- ¡¡¡LÍNEA AÑADIDA!!!
+
         update_data = {
             'nombre': nuevo_nombre,
             'descripcion': nueva_desc,
-            'precio_noche': nuevo_precio
+            'precio_noche': nuevo_precio,
+            'imagen_url': nueva_imagen_url # <-- ¡¡¡LÍNEA AÑADIDA!!!
         }
+        # --- FIN DE SECCIÓN ACTUALIZADA ---
+
+        # ¡Acción de actualizar! (Sin cambios)
         db.child("experiencias").child(experiencia_id).update(update_data)
         flash('Experiencia actualizada con éxito.', 'success')
+        
     except Exception as e:
         flash(f'Error al actualizar la experiencia: {e}', 'danger')
+    
+    # Redirige inteligentemente (Sin cambios)
     if session.get('role') == 'admin':
         return redirect(url_for('admin_panel'))
     else:
         return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
-
+    
 @app.route('/crear-experiencia')
 @login_required
 @role_required('propietaria')
