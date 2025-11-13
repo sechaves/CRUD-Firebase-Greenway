@@ -80,23 +80,23 @@
           Iteramos sobre los 'hospedajes' que pasamos desde main.py.
           Usamos la sintaxis de Python para formatear el precio.
         -->
-        {% for lugar in experiencias %}
+        {% for experiencia in experiencias %}
             <div class="col-lg-4 col-md-6 mb-4 d-flex">
                 <div class="event-card w-100">
                     <div class="event-card-image">
-                        <img src="{{ lugar.imagen_url }}" alt="{{ lugar.nombre }}">
+                        <img src="{{ experiencia.imagen_url }}" alt="{{ experiencia.nombre }}">
                     </div>
                     <div class="event-card-content">
-                        <h5>{{ lugar.nombre }}</h5>
-                        <p class="price">Desde {{ "${:,.0f}".format(lugar.precio_noche) }} COP / noche</p>
+                        <h5>{{ experiencia.nombre }}</h5>
+                        <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP / noche</p>
                         <p class="text-muted">
                             <!-- trunca la descripción a 100 caracteres -->
-                            {{ lugar.descripcion | truncate(100) }}
+                            {{ experiencia.descripcion | truncate(100) }}
                         </p>
                     </div>
                     <div class="card-footer-custom">
-                        <!-- Enlazamos a la página de detalle con el ID del lugar -->
-                        <a href="{{ url_for('lugar_detalle', lugar_id=lugar.id) }}" class="btn btn-greenway-details w-100">
+                        <!-- Enlazamos a la página de detalle con el ID del experiencia -->
+                        <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
                             Ver Detalles y Reservar
                         </a>
                     </div>

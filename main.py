@@ -213,9 +213,9 @@ def home():
         all_experiencias_data = db.child("experiencias").get().val()
         experiencias_list = []
         if all_experiencias_data:
-            for lugar_id, lugar_info in all_experiencias_data.items():
-                lugar_info['id'] = lugar_id
-                experiencias_list.append(lugar_info)
+            for experiencia_id, experiencia_info in all_experiencias_data.items():
+                experiencia_info['id'] = experiencia_id
+                experiencias_list.append(experiencia_info)
         
         return render_template('home.html', session=session, experiencias=experiencias_list)
     except Exception as e:
@@ -229,9 +229,9 @@ def experiencias():
         all_experiencias_data = db.child("experiencias").get().val()
         experiencias_list = []
         if all_experiencias_data:
-            for lugar_id, lugar_info in all_experiencias_data.items():
-                lugar_info['id'] = lugar_id
-                experiencias_list.append(lugar_info)
+            for experiencia_id, experiencia_info in all_experiencias_data.items():
+                experiencia_info['id'] = experiencia_id
+                experiencias_list.append(experiencia_info)
         
         return render_template('experiencias.html', session=session, experiencias=experiencias_list)
     except Exception as e:
@@ -348,17 +348,17 @@ def admin_panel():
         return redirect(url_for('home'))
 
 
-@app.route('/crear-lugar')
+@app.route('/crear-experiencia')
 @login_required
 @role_required('propietaria')
-def crear_lugar_form():
-    return render_template('crear_lugar.html', session=session)
+def crear_experiencia_form():
+    return render_template('crear_experiencia.html', session=session)
 
 
-@app.route('/crear-lugar-submit', methods=['POST'])
+@app.route('/crear-experiencia-submit', methods=['POST'])
 @login_required
 @role_required('propietaria')
-def crear_lugar_submit():
+def crear_experiencia_submit():
     try:
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
@@ -367,7 +367,7 @@ def crear_lugar_submit():
         
         placeholder_img = "https://cf.bstatic.com/xdata/images/hotel/max1024x768/658391731.jpg?k=8a8c5a5fe9ce371b31ecbf4e8db05f2a3d1fde897d80338c9e8a758980d8521d&o=&hp=1"
 
-        lugar_data = {
+        experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
             'precio_noche': int(precio_noche),
@@ -375,30 +375,30 @@ def crear_lugar_submit():
             'imagen_url': placeholder_img
         }
         
-        nuevo_lugar = db.child("experiencias").push(lugar_data)
+        nuevo_experiencia = db.child("experiencias").push(experiencia_data)
         
-        flash('¡Lugar registrado con éxito!', 'success')
-        return redirect(url_for('lugar_detalle', lugar_id=nuevo_lugar['name']))
+        flash('¡experiencia registrado con éxito!', 'success')
+        return redirect(url_for('experiencia_detalle', experiencia_id=nuevo_experiencia['name']))
         
     except Exception as e:
-        flash(f'Error al crear el lugar: {e}', 'danger')
-        return redirect(url_for('crear_lugar_form'))
+        flash(f'Error al crear el experiencia: {e}', 'danger')
+        return redirect(url_for('crear_experiencia_form'))
 
 
-@app.route('/lugar/<lugar_id>')
+@app.route('/experiencia/<experiencia_id>')
 @login_required
-def lugar_detalle(lugar_id):
+def experiencia_detalle(experiencia_id):
     try:
-        lugar_data = db.child("experiencias").child(lugar_id).get().val()
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
         
-        if not lugar_data:
-            flash('Ese lugar no existe.', 'danger')
+        if not experiencia_data:
+            flash('Ese experiencia no existe.', 'danger')
             return redirect(url_for('home'))
             
-        return render_template('lugar_detalle.html', session=session, lugar=lugar_data)
+        return render_template('experiencia_detalle.html', session=session, experiencia=experiencia_data)
         
     except Exception as e:
-        flash(f'Error al cargar el lugar: {e}', 'danger')
+        flash(f'Error al cargar el experiencia: {e}', 'danger')
         return redirect(url_for('home'))
 
 # =================================================================

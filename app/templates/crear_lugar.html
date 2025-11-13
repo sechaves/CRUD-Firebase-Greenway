@@ -23,17 +23,17 @@
             
             <h1 class="mb-4">Registrar Nueva Experiencia</h1>
 
-            <!-- Formulario para crear el lugar -->
+            <!-- Formulario para crear el experiencia -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     Detalles de la experiencia
                 </div>
                 <div class="card-body p-4">
                     <!-- 
-                        Este formulario envía los datos a la ruta '/crear-lugar-submit'
+                        Este formulario envía los datos a la ruta '/crear-experiencia-submit'
                         que creamos en main.py
                     -->
-                    <form action="{{ url_for('crear_lugar_submit') }}" method="POST">
+                    <form action="{{ url_for('crear_experiencia_submit') }}" method="POST">
                         
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre de la experiencia</label>

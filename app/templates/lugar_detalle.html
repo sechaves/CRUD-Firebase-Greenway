@@ -1,12 +1,12 @@
 <!-- Hereda de la plantilla base -->
 {% extends "base.html" %}
 
-<!-- El título será el nombre del lugar -->
-{% block title %}{{ lugar.nombre }}{% endblock %}
+<!-- El título será el nombre del experiencia -->
+{% block title %}{{ experiencia.nombre }}{% endblock %}
 
 {% block styles %}
 <style>
-    .lugar-imagen {
+    .experiencia-imagen {
         width: 100%;
         height: 400px;
         object-fit: cover;
@@ -34,25 +34,25 @@
 {% block content %}
 <div class="container my-5">
     
-    {% if lugar %}
+    {% if experiencia %}
     <div class="row">
         <!-- Columna de la Imagen -->
         <div class="col-lg-7 mb-4">
-            <img src="{{ lugar.imagen_url }}" class="lugar-imagen" alt="{{ lugar.nombre }}">
+            <img src="{{ experiencia.imagen_url }}" class="experiencia-imagen" alt="{{ experiencia.nombre }}">
         </div>
 
         <!-- Columna de Detalles y Reserva -->
         <div class="col-lg-5">
-            <h1 class="display-5 fw-bold">{{ lugar.nombre }}</h1>
-            <p class="lead text-muted">Registrado por: {{ lugar.nombre_propietario }}</p>
+            <h1 class="display-5 fw-bold">{{ experiencia.nombre }}</h1>
+            <p class="lead text-muted">Registrado por: {{ experiencia.nombre_propietario }}</p>
             
             <hr class="my-4">
 
-            <p class="fs-5">{{ lugar.descripcion }}</p>
+            <p class="fs-5">{{ experiencia.descripcion }}</p>
 
             <div class="d-flex justify-content-between align-items-center my-4">
                 <span class="precio-tag">
-                    ${{ "{:,.0f}".format(lugar.precio_noche) }} COP
+                    ${{ "{:,.0f}".format(experiencia.precio_noche) }} COP
                 </span>
                 <span class="text-muted">/ por noche</span>
             </div>
@@ -65,7 +65,7 @@
     {% else %}
     <div class="text-center">
         <h2>Oops!</h2>
-        <p>Parece que este lugar no existe o no se pudo cargar.</p>
+        <p>Parece que esta experiencia no existe o no se pudo cargar.</p>
         <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al Inicio</a>
     </div>
     {% endif %}
