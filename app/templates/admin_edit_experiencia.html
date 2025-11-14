@@ -10,56 +10,63 @@
 
             <form method="POST" action="{{ url_for('admin_update_experiencia', experiencia_id=exp_id) }}">
                 
-                <div class="mb-3">
-                    <label class="form-label">Links (URL) de las Fotos</label>
-                    <div id="image-fields-container">
-                        {% for img_url in experiencia.imagenes %}
-                        <div class="input-group mb-2">
-                            <input type="text" class="form-control" name="imagen_url" 
-                                   value="{{ img_url }}" required>
-                            <button type="button" class="btn btn-outline-danger" 
-                                    onclick="this.parentElement.remove()">X</button>
+                <div class="card shadow-sm">
+                    <div class="card-header" style="background-color: var(--greenway-primary); color: white; font-weight: 600;">
+                        Editar Detalles
+                    </div>
+                    <div class="card-body p-4">
+                
+                        <div class="mb-3">
+                            <label class="form-label">Links (URL) de las Fotos</label>
+                            <div id="image-fields-container">
+                                {% for img_url in experiencia.imagenes %}
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="imagen_url" 
+                                           value="{{ img_url }}" required>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            onclick="this.parentElement.remove()">X</button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">
+                                Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
+                            </div>
+                            <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
+                                + Añadir otra foto
+                            </button>
                         </div>
-                        {% endfor %}
-                    </div>
-                    <div class="form-text">
-                        Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
-                    </div>
-                    <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
-                        + Añadir otra foto
-                    </button>
-                </div>
 
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre de la Experiencia</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" 
-                           value="{{ experiencia.nombre }}" required>
-                </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre de la Experiencia</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   value="{{ experiencia.nombre }}" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion" 
-                              rows="5" required>{{ experiencia.descripcion }}</textarea>
-                </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" 
+                                      rows="5" required>{{ experiencia.descripcion }}</textarea>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="precio" class="form-label">Precio por Noche (COP)</label>
-                    <input type="number" class="form-control" id="precio" name="precio" 
-                           value="{{ experiencia.precio_noche }}" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="maps_embed_url" class="form-label">Embed de Google Maps</label>
-                    <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
-                              placeholder='Pega el código <iframe> de Google Maps aquí'>{{ experiencia.maps_embed_url }}</textarea>
-                    <div class="form-text">
-                        En Google Maps, haz clic en "Compartir" > "Insertar un mapa" y copia el código <iframe>.
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Cancelar</a>
-            </form>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio por Noche (COP)</label>
+                            <input type="number" class="form-control" id="precio" name="precio" 
+                                   value="{{ experiencia.precio_noche }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="maps_embed_url" class="form-label">Embed de Google Maps</label>
+                            <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
+                                      placeholder='Pega el código <iframe> de Google Maps aquí'>{{ experiencia.maps_embed_url }}</textarea>
+                            <div class="form-text">
+                                En Google Maps, haz clic en "Compartir" > "Insertar un mapa" y copia el código <iframe>.
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                        <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Cancelar</a>
+                        
+                    </div> </div> </form>
 
         </div>
     </div>
