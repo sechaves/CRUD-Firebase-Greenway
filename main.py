@@ -164,7 +164,8 @@ def reset_password_request():
 @login_required
 def home():
     try:
-        all_experiencias_data = db.child("experiencias").get().val()
+        # Usamos 'get().val() or {}' para evitar errores si está vacío
+        all_experiencias_data = db.child("experiencias").get().val() or {} 
         experiencias_list = []
         if all_experiencias_data:
             for experiencia_id, experiencia_info in all_experiencias_data.items():
@@ -179,7 +180,7 @@ def home():
 @login_required
 def experiencias():
     try:
-        all_experiencias_data = db.child("experiencias").get().val()
+        all_experiencias_data = db.child("experiencias").get().val() or {}
         experiencias_list = []
         if all_experiencias_data:
             for experiencia_id, experiencia_info in all_experiencias_data.items():
@@ -200,7 +201,7 @@ def profile():
         if not user_data:
             flash('No se pudieron cargar los datos del usuario.', 'danger')
             return redirect(url_for('home'))
-        return render_template('profile.html', user=user_data, session=session)    
+        return render_template('profile.html', user=user_data, session=session)     
     except Exception as e:
         flash(f'Error al cargar perfil: {e}', 'danger')
         return redirect(url_for('home'))
@@ -320,11 +321,14 @@ def admin_edit_experiencia(experiencia_id):
         flash(f'Error al cargar la experiencia: {e}', 'danger')
         return redirect(url_for('admin_panel'))
 
+#
+# --- ¡¡¡RUTA ACTUALIZADA!!! ---
+#
 @app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
 @login_required
 def admin_update_experiencia(experiencia_id):
     """
-    Guarda los cambios de la edición (AHORA CON LISTA DE FOTOS).
+    Guarda los cambios de la edición (AHORA CON MAPAS Y LISTA DE FOTOS).
     """
     try:
         # --- LÓGICA DE PERMISO (Sin cambios) ---
@@ -348,14 +352,18 @@ def admin_update_experiencia(experiencia_id):
         nueva_desc = request.form['descripcion']
         nuevo_precio = int(request.form['precio'])
         
-        # ¡¡¡USA 'GETLIST' IGUAL QUE EN 'CREAR'!!!
+        # ¡Usa 'getlist' para las fotos!
         lista_de_imagenes = request.form.getlist('imagen_url')
+        
+        # ¡Añade el nuevo campo de mapas!
+        nueva_maps_embed_url = request.form['maps_embed_url']
 
         update_data = {
             'nombre': nuevo_nombre,
             'descripcion': nueva_desc,
             'precio_noche': nuevo_precio,
-            'imagenes': lista_de_imagenes # ¡Guarda la lista!
+            'imagenes': lista_de_imagenes,
+            'maps_embed_url': nueva_maps_embed_url # ¡Añadido!
         }
         # --- FIN DE SECCIÓN ACTUALIZADA ---
 
@@ -376,6 +384,9 @@ def admin_update_experiencia(experiencia_id):
 def crear_experiencia_form():
     return render_template('crear_experiencia.html', session=session)
 
+#
+# --- ¡¡¡RUTA ACTUALIZADA!!! ---
+#
 @app.route('/crear-experiencia-submit', methods=['POST'])
 @login_required
 @role_required('propietaria')
@@ -386,21 +397,19 @@ def crear_experiencia_submit():
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
 
-        # --- ¡¡¡CAMBIO MÁGICO!!! ---
-        # 'getlist' toma TODOS los campos con name="imagen_url" 
-        # y los mete en una lista de Python.
+        # ¡Usa 'getlist' para las fotos!
         lista_de_imagenes = request.form.getlist('imagen_url')
-        # --------------------------
+        
+        # ¡Añade el nuevo campo de mapas!
+        maps_embed_url = request.form['maps_embed_url']
 
         experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
             'precio_noche': int(precio_noche),
             'propietario_id': propietario_id,
-
-            # ¡Guardamos la lista entera en la DB!
-            # La vieja 'imagen_url' se reemplaza por 'imagenes'
-            'imagenes': lista_de_imagenes 
+            'imagenes': lista_de_imagenes,
+            'maps_embed_url': maps_embed_url # ¡Añadido!
         }
 
         nuevo_experiencia = db.child("experiencias").push(experiencia_data)

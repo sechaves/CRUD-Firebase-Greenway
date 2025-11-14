@@ -44,7 +44,6 @@
     <div class="row mb-3">
         <div class="col-12">
             <h1 class="display-5 fw-bold">{{ experiencia.nombre }}</h1>
-            <p class="lead text-muted">Registrado por: {{ experiencia.propietario_id }}</p>
         </div>
     </div>
 
@@ -86,6 +85,14 @@
             <hr class="my-4">
             <h2 class="fw-bold">Descripción</h2>
             <p class="fs-5" style="white-space: pre-wrap;">{{ experiencia.descripcion }}</p>
+            {% if experiencia.maps_embed_url %}
+            <hr class="my-4">
+            <h2 class="fw-bold">Ubicación</h2>
+
+            <div class="ratio ratio-16x9" style="border-radius: 15px; overflow: hidden;">
+                {{ experiencia.maps_embed_url|safe }}
+            </div>
+        {% endif %}
 
         </div> <div class="col-lg-4">
             <div class="sidebar-reservas"> <div class="card shadow-sm">

@@ -84,7 +84,7 @@
             <div class="col-lg-4 col-md-6 mb-4 d-flex">
                 <div class="event-card w-100">
                     <div class="event-card-image">
-                        <img src="{{ experiencia.imagen_url }}" alt="{{ experiencia.nombre }}">
+                        <img src="{{ (experiencia.imagenes[0]) if experiencia.imagenes else 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' }}" alt="{{ experiencia.nombre }}">
                     </div>
                     <div class="event-card-content">
                         <h5>{{ experiencia.nombre }}</h5>
