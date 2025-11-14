@@ -12,9 +12,7 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Links (URL) de las Fotos</label>
-                    
                     <div id="image-fields-container">
-                        
                         {% for img_url in experiencia.imagenes %}
                         <div class="input-group mb-2">
                             <input type="text" class="form-control" name="imagen_url" 
@@ -24,7 +22,6 @@
                         </div>
                         {% endfor %}
                     </div>
-
                     <div class="form-text">
                         Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
                     </div>
@@ -32,6 +29,7 @@
                         + Añadir otra foto
                     </button>
                 </div>
+
                 <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre de la Experiencia</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" 
@@ -49,11 +47,11 @@
                     <input type="number" class="form-control" id="precio" name="precio" 
                            value="{{ experiencia.precio_noche }}" required>
                 </div>
-
+                
                 <div class="mb-3">
                     <label for="maps_embed_url" class="form-label">Embed de Google Maps</label>
-                        <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
-                            placeholder='Pega el código <iframe> de Google Maps aquí'>{{ experiencia.maps_embed_url }}</textarea>
+                    <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
+                              placeholder='Pega el código <iframe> de Google Maps aquí'>{{ experiencia.maps_embed_url }}</textarea>
                     <div class="form-text">
                         En Google Maps, haz clic en "Compartir" > "Insertar un mapa" y copia el código <iframe>.
                     </div>
@@ -79,7 +77,7 @@ document.getElementById('add-image-btn').addEventListener('click', function() {
     var newInput = document.createElement('input');
     newInput.type = 'text';
     newInput.className = 'form-control';
-    newInput.name = 'imagen_url'; // ¡Mismo nombre!
+    newInput.name = 'imagen_url';
     newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
     newInput.required = true;
 
