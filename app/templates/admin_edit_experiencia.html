@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block title %}Editar Experiencia{% endblock %}
 
 {% block content %}
@@ -12,6 +11,28 @@
             <form method="POST" action="{{ url_for('admin_update_experiencia', experiencia_id=exp_id) }}">
                 
                 <div class="mb-3">
+                    <label class="form-label">Links (URL) de las Fotos</label>
+                    
+                    <div id="image-fields-container">
+                        
+                        {% for img_url in experiencia.imagenes %}
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" name="imagen_url" 
+                                   value="{{ img_url }}" required>
+                            <button type="button" class="btn btn-outline-danger" 
+                                    onclick="this.parentElement.remove()">X</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-text">
+                        Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
+                    </div>
+                    <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
+                        + Añadir otra foto
+                    </button>
+                </div>
+                <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre de la Experiencia</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" 
                            value="{{ experiencia.nombre }}" required>
@@ -23,20 +44,10 @@
                               rows="5" required>{{ experiencia.descripcion }}</textarea>
                 </div>
 
-
                 <div class="mb-3">
                     <label for="precio" class="form-label">Precio por Noche (COP)</label>
                     <input type="number" class="form-control" id="precio" name="precio" 
                            value="{{ experiencia.precio_noche }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="imagen_url" class="form-label">Link (URL) de la Foto</label>
-                    <input type="text" class="form-control" id="imagen_url" name="imagen_url" 
-                        value="{{ experiencia.imagen_url }}" required>
-                    <div class="form-text">
-                        Pega el "Enlace directo" de <a href="https://postimages.org/" target="_blank">Postimages.org</a>
-                    </div>
                 </div>
                 
                 <button type="submit" class="btn btn-success">Guardar Cambios</button>
@@ -46,4 +57,34 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+document.getElementById('add-image-btn').addEventListener('click', function() {
+    var container = document.getElementById('image-fields-container');
+    var newFieldGroup = document.createElement('div');
+    newFieldGroup.className = 'input-group mb-2';
+
+    var newInput = document.createElement('input');
+    newInput.type = 'text';
+    newInput.className = 'form-control';
+    newInput.name = 'imagen_url'; // ¡Mismo nombre!
+    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+    newInput.required = true;
+
+    var deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'btn btn-outline-danger';
+    deleteButton.innerText = 'X';
+    deleteButton.onclick = function() {
+        container.removeChild(newFieldGroup);
+    };
+
+    newFieldGroup.appendChild(newInput);
+    newFieldGroup.appendChild(deleteButton);
+    container.appendChild(newFieldGroup);
+});
+</script>
 {% endblock %}

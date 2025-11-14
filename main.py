@@ -322,13 +322,9 @@ def admin_edit_experiencia(experiencia_id):
 
 @app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
 @login_required
-# Se quitó @role_required('admin') para añadir la lógica abajo
 def admin_update_experiencia(experiencia_id):
     """
-    Guarda los cambios de la edición.
-    Permitido si:
-    1. Eres admin.
-    2. Eres el propietario de esta experiencia.
+    Guarda los cambios de la edición (AHORA CON LISTA DE FOTOS).
     """
     try:
         # --- LÓGICA DE PERMISO (Sin cambios) ---
@@ -351,24 +347,24 @@ def admin_update_experiencia(experiencia_id):
         nuevo_nombre = request.form['nombre']
         nueva_desc = request.form['descripcion']
         nuevo_precio = int(request.form['precio'])
-        nueva_imagen_url = request.form['imagen_url'] # <-- ¡¡¡LÍNEA AÑADIDA!!!
+        
+        # ¡¡¡USA 'GETLIST' IGUAL QUE EN 'CREAR'!!!
+        lista_de_imagenes = request.form.getlist('imagen_url')
 
         update_data = {
             'nombre': nuevo_nombre,
             'descripcion': nueva_desc,
             'precio_noche': nuevo_precio,
-            'imagen_url': nueva_imagen_url # <-- ¡¡¡LÍNEA AÑADIDA!!!
+            'imagenes': lista_de_imagenes # ¡Guarda la lista!
         }
         # --- FIN DE SECCIÓN ACTUALIZADA ---
 
-        # ¡Acción de actualizar! (Sin cambios)
         db.child("experiencias").child(experiencia_id).update(update_data)
         flash('Experiencia actualizada con éxito.', 'success')
         
     except Exception as e:
         flash(f'Error al actualizar la experiencia: {e}', 'danger')
     
-    # Redirige inteligentemente (Sin cambios)
     if session.get('role') == 'admin':
         return redirect(url_for('admin_panel'))
     else:
