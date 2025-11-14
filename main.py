@@ -164,8 +164,7 @@ def reset_password_request():
 @login_required
 def home():
     try:
-        # Usamos 'get().val() or {}' para evitar errores si está vacío
-        all_experiencias_data = db.child("experiencias").get().val() or {} 
+        all_experiencias_data = db.child("experiencias").get().val() or {}
         experiencias_list = []
         if all_experiencias_data:
             for experiencia_id, experiencia_info in all_experiencias_data.items():
@@ -266,12 +265,6 @@ def admin_panel():
 @app.route('/admin/delete-experiencia/<experiencia_id>', methods=['POST'])
 @login_required
 def admin_delete_experiencia(experiencia_id):
-    """
-    Elimina una experiencia.
-    Permitido si:
-    1. Eres admin.
-    2. Eres el propietario de esta experiencia.
-    """
     try:
         experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
         if not experiencia_data:
@@ -296,12 +289,6 @@ def admin_delete_experiencia(experiencia_id):
 @app.route('/admin/edit-experiencia/<experiencia_id>')
 @login_required
 def admin_edit_experiencia(experiencia_id):
-    """
-    Muestra el formulario para editar una experiencia.
-    Permitido si:
-    1. Eres admin.
-    2. Eres el propietario de esta experiencia.
-    """
     try:
         experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
         if not experiencia_data:
@@ -322,13 +309,13 @@ def admin_edit_experiencia(experiencia_id):
         return redirect(url_for('admin_panel'))
 
 #
-# --- ¡¡¡RUTA ACTUALIZADA!!! ---
+# --- ¡¡¡RUTA "UPDATE" REVERTIDA (SIN GOOGLE MAPS)!!! ---
 #
 @app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
 @login_required
 def admin_update_experiencia(experiencia_id):
     """
-    Guarda los cambios de la edición (AHORA CON MAPAS Y LISTA DE FOTOS).
+    Guarda los cambios de la edición (AHORA CON LISTA DE FOTOS).
     """
     try:
         # --- LÓGICA DE PERMISO (Sin cambios) ---
@@ -346,26 +333,20 @@ def admin_update_experiencia(experiencia_id):
             return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
         # --- FIN DE LÓGICA DE PERMISO ---
 
-        # --- ¡¡¡SECCIÓN ACTUALIZADA!!! ---
-        # Saca los datos del formulario
+        # --- ¡¡¡SECCIÓN REVERTIDA!!! ---
         nuevo_nombre = request.form['nombre']
         nueva_desc = request.form['descripcion']
         nuevo_precio = int(request.form['precio'])
-        
-        # ¡Usa 'getlist' para las fotos!
         lista_de_imagenes = request.form.getlist('imagen_url')
-        
-        # ¡Añade el nuevo campo de mapas!
-        nueva_maps_embed_url = request.form['maps_embed_url']
 
         update_data = {
             'nombre': nuevo_nombre,
             'descripcion': nueva_desc,
             'precio_noche': nuevo_precio,
-            'imagenes': lista_de_imagenes,
-            'maps_embed_url': nueva_maps_embed_url # ¡Añadido!
+            'imagenes': lista_de_imagenes # ¡Guarda la lista!
+            # ¡YA NO HAY 'maps_embed_url'!
         }
-        # --- FIN DE SECCIÓN ACTUALIZADA ---
+        # --- FIN DE SECCIÓN REVERTIDA ---
 
         db.child("experiencias").child(experiencia_id).update(update_data)
         flash('Experiencia actualizada con éxito.', 'success')
@@ -385,7 +366,7 @@ def crear_experiencia_form():
     return render_template('crear_experiencia.html', session=session)
 
 #
-# --- ¡¡¡RUTA ACTUALIZADA!!! ---
+# --- ¡¡¡RUTA "CREAR" REVERTIDA (SIN GOOGLE MAPS)!!! ---
 #
 @app.route('/crear-experiencia-submit', methods=['POST'])
 @login_required
@@ -396,20 +377,15 @@ def crear_experiencia_submit():
         descripcion = request.form['descripcion']
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
-
-        # ¡Usa 'getlist' para las fotos!
         lista_de_imagenes = request.form.getlist('imagen_url')
-        
-        # ¡Añade el nuevo campo de mapas!
-        maps_embed_url = request.form['maps_embed_url']
 
         experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
             'precio_noche': int(precio_noche),
             'propietario_id': propietario_id,
-            'imagenes': lista_de_imagenes,
-            'maps_embed_url': maps_embed_url # ¡Añadido!
+            'imagenes': lista_de_imagenes
+            # ¡YA NO HAY 'maps_embed_url'!
         }
 
         nuevo_experiencia = db.child("experiencias").push(experiencia_data)
