@@ -385,22 +385,26 @@ def crear_experiencia_form():
 @role_required('propietaria')
 def crear_experiencia_submit():
     try:
-        # 1. Obtenemos los datos del formulario (el texto)
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
 
-        # 2. ¡NUEVO! Leemos el link que el usuario pegó
-        imagen_url = request.form['imagen_url']
+        # --- ¡¡¡CAMBIO MÁGICO!!! ---
+        # 'getlist' toma TODOS los campos con name="imagen_url" 
+        # y los mete en una lista de Python.
+        lista_de_imagenes = request.form.getlist('imagen_url')
+        # --------------------------
 
-        # 3. Guardamos los datos (incluyendo el link) en la DB
         experiencia_data = {
             'nombre': nombre,
             'descripcion': descripcion,
             'precio_noche': int(precio_noche),
             'propietario_id': propietario_id,
-            'imagen_url': imagen_url  # <-- ¡Usamos el link de Imgur!
+
+            # ¡Guardamos la lista entera en la DB!
+            # La vieja 'imagen_url' se reemplaza por 'imagenes'
+            'imagenes': lista_de_imagenes 
         }
 
         nuevo_experiencia = db.child("experiencias").push(experiencia_data)

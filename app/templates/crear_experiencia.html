@@ -12,15 +12,25 @@
                     <div class="card-header" style="background-color: var(--greenway-primary); color: white; font-weight: 600;">
                         Detalles de la experiencia
                     </div>
-                    <div class="card-body p-4">
 
+                    <div class="card-body p-4"> 
+                    
                         <div class="mb-3">
-                            <label for="imagen_url" class="form-label">Link (URL) de la Foto</label>
-                            <input type="text" class="form-control" id="imagen_url" name="imagen_url" 
-                                   placeholder="Ej: https://i.postimg.cc/123456/MiFoto.jpg" required>
-                            <div class="form-text">
-                                Sube tu foto a <a href="https://postimages.org/" target="_blank">postimages</a> y pega el "Direct Link" aquí.
+                            <label class="form-label">Links (URL) de las Fotos</label>
+                            
+                            <div id="image-fields-container">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="imagen_url" 
+                                           placeholder="https://i.postimg.cc/... (Link directo)" required>
+                                </div>
                             </div>
+
+                            <div class="form-text">
+                                Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
+                            </div>
+                            <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
+                                + Añadir otra foto
+                            </button>
                         </div>
                         
                         <div class="mb-3">
@@ -43,10 +53,44 @@
                             Registrar Experiencia
                         </button>
 
-                    </div> 
-                </div> 
-            </form> 
+                    </div> </div> </form> 
         </div> 
     </div> 
 </div> 
+{% endblock %} {% block scripts %}
+<script>
+document.getElementById('add-image-btn').addEventListener('click', function() {
+    // 1. Obtener el contenedor
+    var container = document.getElementById('image-fields-container');
+
+    // 2. Crear un nuevo 'div' (para el input y el botón de borrar)
+    var newFieldGroup = document.createElement('div');
+    newFieldGroup.className = 'input-group mb-2';
+
+    // 3. Crear el nuevo <input>
+    var newInput = document.createElement('input');
+    newInput.type = 'text';
+    newInput.className = 'form-control';
+    newInput.name = 'imagen_url'; // ¡Mismo nombre!
+    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+    newInput.required = true;
+
+    // 4. Crear el botón de "Borrar"
+    var deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'btn btn-outline-danger';
+    deleteButton.innerText = 'X';
+    deleteButton.onclick = function() {
+        // Cuando se hace clic, borra el 'div' (newFieldGroup) que lo contiene
+        container.removeChild(newFieldGroup);
+    };
+
+    // 5. Juntar el <input> y el botón "X" en el 'div'
+    newFieldGroup.appendChild(newInput);
+    newFieldGroup.appendChild(deleteButton);
+    
+    // 6. Añadir el nuevo grupo de campos al contenedor
+    container.appendChild(newFieldGroup);
+});
+</script>
 {% endblock %}

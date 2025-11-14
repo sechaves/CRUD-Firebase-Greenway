@@ -38,7 +38,40 @@
     {% if experiencia %}
     <div class="row">
         <div class="col-lg-7 mb-4">
-            <img src="{{ experiencia.imagen_url }}" class="experiencia-imagen" alt="{{ experiencia.nombre }}">
+            <div id="carouselExperiencia" class="carousel slide shadow-sm mb-4" data-bs-ride="carousel">
+
+    <div class="carousel-indicators">
+        {% for img in experiencia.imagenes %}
+            <button type="button" data-bs-target="#carouselExperiencia" 
+                    data-bs-slide-to="{{ loop.index0 }}" 
+                    class="{{ 'active' if loop.first else '' }}" 
+                    aria-current="{{ 'true' if loop.first else 'false' }}" 
+                    aria-label="Slide {{ loop.index }}">
+            </button>
+        {% endfor %}
+    </div>
+
+    <div class="carousel-inner" style="border-radius: 15px;">
+        {% for img_url in experiencia.imagenes %}
+        <div class="carousel-item {{ 'active' if loop.first else '' }}">
+            <img src="{{ img_url }}" class="d-block w-100 experiencia-imagen" alt="Foto de {{ experiencia.nombre }}">
+        </div>
+        {% else %}
+        <div class="carousel-item active">
+            <img src="https://via.placeholder.com/800x400.png?text=Sin+Imagen" class="d-block w-100 experiencia-imagen" alt="Sin Imagen">
+        </div>
+        {% endfor %}
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
         </div>
 
         <div class="col-lg-5">
