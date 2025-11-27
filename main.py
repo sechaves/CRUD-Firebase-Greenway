@@ -89,7 +89,7 @@ def signup():
     email = request.form['email']
     password = request.form['password']
     nombre = request.form['nombre']
-    # telefono = request.form['telefono'] # Asegúrate si tu form tiene telefono o no
+    # telefono = request.form.get('telefono', '') 
     rol_elegido = request.form.get('rol')
 
     if not rol_elegido:
@@ -102,7 +102,7 @@ def signup():
 
         nuevo_usuario = None
         if rol_elegido == 'usuario':
-            # Ajusta según los argumentos de tu constructor Usuario
+            # Ajusta según tu modelo (si pide teléfono o no)
             nuevo_usuario = Usuario(user_id, nombre, email) 
         elif rol_elegido == 'propietaria':
             nuevo_usuario = Propietaria(user_id, nombre, email)
@@ -158,6 +158,25 @@ def logout():
     flash('Has cerrado sesión exitosamente.', 'success')
     return redirect(url_for('login'))
 
+# --- ¡AQUÍ ESTABAN FALTANDO ESTAS RUTAS! ---
+@app.route('/reset-password')
+@anonymous_required
+def reset_password():
+    return render_template('reset_password.html')
+
+@app.route('/reset-password-request', methods=['POST'])
+@anonymous_required
+def reset_password_request():
+    email = request.form['email']
+    try:
+        auth.send_password_reset_email(email)
+        flash('¡Correo enviado! Revisa tu bandeja de entrada (y spam).', 'success')
+        return redirect(url_for('login'))
+    except Exception as e:
+        flash('Error al enviar el correo. ¿Email correcto?', 'danger')
+        return redirect(url_for('reset_password'))
+# ---------------------------------------------
+
 # --- Rutas App ---
 
 @app.route('/home')
@@ -189,36 +208,84 @@ def experiencias():
         flash(f'Error al cargar las experiencias: {e}', 'danger')
         return redirect(url_for('home'))
 
-# --- CHAT (Lógica Simplificada) ---
+@app.route('/profile')
+@login_required
+def profile():
+    try:
+        user_id = session['user_id']
+        user_rol = session['role']
+        user_data = Persona.get_user_data_by_role(db, user_rol, user_id)
+        if not user_data:
+            flash('No se pudieron cargar los datos del usuario.', 'danger')
+            return redirect(url_for('home'))
+        return render_template('profile.html', user=user_data, session=session)     
+    except Exception as e:
+        flash(f'Error al cargar perfil: {e}', 'danger')
+        return redirect(url_for('home'))
+
+@app.route('/settings')
+@login_required
+def settings():
+    return redirect(url_for('profile'))
+
+@app.route('/update-profile', methods=['POST'])
+@login_required
+def update_profile():
+    try:
+        user_id = session['user_id']
+        user_rol = session['role']
+        nuevo_nombre = request.form['nombre']
+        if not nuevo_nombre or len(nuevo_nombre.strip()) == 0:
+            flash('El nombre no puede estar vacío.', 'danger')
+            return redirect(url_for('profile'))
+        nodo_db = Persona.get_db_node_by_role(user_rol)
+        db.child(nodo_db).child(user_id).update({"nombre": nuevo_nombre.strip()})
+        flash('Tu nombre ha sido actualizado con éxito.', 'success')
+    except Exception as e:
+        flash(f'Error al actualizar el perfil: {e}', 'danger')
+    return redirect(url_for('profile'))
+
+@app.route('/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    try:
+        user_id = session['user_id']
+        user_rol = session['role']
+        admin_auth.delete_user(user_id)
+        nodo_db = Persona.get_db_node_by_role(user_rol)
+        db.child(nodo_db).child(user_id).remove()
+        session.clear()
+        flash('Tu cuenta ha sido eliminada permanentemente.', 'success')
+        return redirect(url_for('login'))
+    except Exception as e:
+        flash(f'Error al eliminar tu cuenta: {e}', 'danger')
+        return redirect(url_for('profile'))
+
+# --- CHAT ---
 def build_room_id(user_a: str, user_b: str, exp_id: str) -> str:
-    # Ordenamos los IDs para que A->B y B->A sea el mismo chat
     a, b = sorted([user_a, user_b])
     return f"chat_{exp_id}_{a}_{b}"
 
 @app.route('/chats')
 @login_required
 def chats():
-    """
-    Solo carga la página HTML. Toda la lógica de tiempo real va en JS.
-    """
     owner_id = request.args.get('owner_id')
     exp_id = request.args.get('exp_id')
-    # initial_text = request.args.get('initial_text', '') # Lo manejaremos en JS si quieres
-
+    
     user_id = session.get('user_id')
     room_id = None
 
     if owner_id and exp_id and user_id:
         room_id = build_room_id(user_id, owner_id, exp_id)
 
-    # NO cargamos mensajes aquí. El JS los cargará de Firebase directamente.
     return render_template('chats.html',
                            session=session,
                            room_id=room_id,
                            owner_id=owner_id,
                            exp_id=exp_id)
 
-# --- Rutas CRUD / Admin (Iguales que antes) ---
+# --- Rutas CRUD / Admin ---
+
 @app.route('/crear-experiencia')
 @login_required
 @role_required('propietaria')
@@ -235,7 +302,7 @@ def crear_experiencia_submit():
         precio_noche = request.form['precio']
         propietario_id = session['user_id']
         
-        # Lecturas opcionales segun tu form
+        # Lecturas del formulario (usamos .get para que no falle si no existen)
         lista_de_imagenes = request.form.getlist('imagen_url') 
         maps_embed_url = request.form.get('maps_embed_url', '')
 
@@ -254,6 +321,7 @@ def crear_experiencia_submit():
 
     except Exception as e:
         flash(f'Error al crear la experiencia: {e}', 'danger')
+        print(f"Error: {e}")
         return redirect(url_for('crear_experiencia_form'))
 
 @app.route('/experiencia/<experiencia_id>')
@@ -287,8 +355,108 @@ def admin_panel():
     except:
         return redirect(url_for('home'))
 
-# Rutas de eliminar/editar (resumidas para no llenar)
-# ... Tus rutas admin_delete, admin_edit, update ...
+@app.route('/admin/delete-experiencia/<experiencia_id>', methods=['POST'])
+@login_required
+def admin_delete_experiencia(experiencia_id):
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            return redirect(url_for('home'))
+
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+        
+        if not (is_owner or is_admin):
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+            
+        db.child("experiencias").child(experiencia_id).remove()
+        flash('Experiencia eliminada con éxito.', 'success')
+    except Exception as e:
+        flash(f'Error al eliminar: {e}', 'danger')
+        
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin_panel'))
+    else:
+        return redirect(url_for('home'))
+
+@app.route('/admin/edit-experiencia/<experiencia_id>')
+@login_required
+def admin_edit_experiencia(experiencia_id):
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            return redirect(url_for('home'))
+            
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+        
+        if not (is_owner or is_admin):
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+            
+        return render_template('admin_edit_experiencia.html', 
+                               session=session,
+                               experiencia=experiencia_data, 
+                               exp_id=experiencia_id)
+    except Exception as e:
+        return redirect(url_for('admin_panel'))
+
+@app.route('/admin/update-experiencia/<experiencia_id>', methods=['POST'])
+@login_required
+def admin_update_experiencia(experiencia_id):
+    try:
+        experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        if not experiencia_data:
+            return redirect(url_for('home'))
+
+        owner_id = experiencia_data.get('propietario_id')
+        is_owner = (owner_id == session['user_id'])
+        is_admin = (session.get('role') == 'admin')
+
+        if not (is_owner or is_admin):
+            return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+
+        nuevo_nombre = request.form['nombre']
+        nueva_desc = request.form['descripcion']
+        nuevo_precio = int(request.form['precio'])
+        lista_de_imagenes = request.form.getlist('imagen_url')
+        # Usamos .get para que no falle si no está en el HTML
+        nueva_maps_embed_url = request.form.get('maps_embed_url', '')
+
+        update_data = {
+            'nombre': nuevo_nombre,
+            'descripcion': nueva_desc,
+            'precio_noche': nuevo_precio,
+            'imagenes': lista_de_imagenes,
+            'maps_embed_url': nueva_maps_embed_url
+        }
+
+        db.child("experiencias").child(experiencia_id).update(update_data)
+        flash('Experiencia actualizada con éxito.', 'success')
+        
+    except Exception as e:
+        flash(f'Error al actualizar: {e}', 'danger')
+    
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin_panel'))
+    else:
+        return redirect(url_for('experiencia_detalle', experiencia_id=experiencia_id))
+
+@app.route('/ask-chatbot', methods=['POST'])
+@login_required
+def ask_chatbot():
+    if chatbot is None:
+        return jsonify({'error': 'El chatbot no está configurado.'}), 500
+    try:
+        data = request.get_json()
+        pregunta = data.get('pregunta')
+        if not pregunta:
+            return jsonify({'error': 'No se recibió ninguna pregunta.'}), 400
+        respuesta = chatbot.ask(pregunta)
+        return jsonify({'respuesta': respuesta})
+    except Exception as e:
+        return jsonify({'error': 'Error interno.'}), 500
 
 # --- Main ---
 if __name__ == '__main__':
