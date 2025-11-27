@@ -1,25 +1,23 @@
 class Persona:
-    """
-    Superclase para todos los tipos de usuarios.
-    Define los atributos y métodos comunes.
-    """
-    def __init__(self, user_id: str, nombre: str, email: str):
-        if not all([user_id, nombre, email]):
-            raise ValueError("ID, nombre y email no pueden estar vacíos")
-        
+    def __init__(self, user_id: str, nombre: str, email: str, telefono: str):
+        if not all([user_id, nombre, email, telefono]):
+            raise ValueError("ID, nombre, email y teléfono no pueden estar vacíos")
+
         self.user_id = user_id
         self.nombre = nombre
         self.email = email
-        self.rol = "persona" # Rol base
-        self.db_node = "personas" # Nodo base
+        self.telefono = telefono
+        self.rol = "persona"
+        self.db_node = "personas"
 
     def to_dict(self) -> dict:
-        """Convierte la instancia en un diccionario para guardarlo en Firebase."""
         return {
             "nombre": self.nombre,
             "email": self.email,
+            "telefono": self.telefono,
             "rol": self.rol
         }
+
 
     def save_to_db(self, db):
         """
@@ -57,34 +55,21 @@ class Persona:
 
 
 class Usuario(Persona):
-    """
-    Subclase para Usuarios normales.
-    Hereda de Persona y define su rol y nodo de DB.
-    """
-    def __init__(self, user_id: str, nombre: str, email: str):
-        super().__init__(user_id, nombre, email)
+    def __init__(self, user_id: str, nombre: str, email: str, telefono: str):
+        super().__init__(user_id, nombre, email, telefono)
         self.rol = "usuario"
         self.db_node = "usuarios"
 
 
 class Propietaria(Persona):
-    """
-    Subclase para Propietarios.
-    Hereda de Persona y define su rol y nodo de DB.
-    """
-    def __init__(self, user_id: str, nombre: str, email: str):
-        super().__init__(user_id, nombre, email)
+    def __init__(self, user_id: str, nombre: str, email: str, telefono: str):
+        super().__init__(user_id, nombre, email, telefono)
         self.rol = "propietaria"
         self.db_node = "propietarios"
 
 
 class Admin(Persona):
-    """
-    Subclase para Administradores.
-    Hereda de Persona y define su rol y nodo de DB.
-    """
-    def __init__(self, user_id: str, nombre: str, email: str):
-        super().__init__(user_id, nombre, email)
+    def __init__(self, user_id: str, nombre: str, email: str, telefono: str):
+        super().__init__(user_id, nombre, email, telefono)
         self.rol = "admin"
         self.db_node = "admins"
-

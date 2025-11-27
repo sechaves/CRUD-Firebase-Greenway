@@ -83,28 +83,34 @@ def signup():
     email = request.form['email']
     password = request.form['password']
     nombre = request.form['nombre']
-    rol_elegido = request.form.get('rol') # 'usuario' o 'propietaria'
+    telefono = request.form['telefono']
+    rol_elegido = request.form.get('rol')
+
     if not rol_elegido:
         flash('Debes seleccionar un tipo de cuenta.', 'danger')
         return redirect(url_for('register'))
+
     try:
         user_auth_data = auth.create_user_with_email_and_password(email, password)
         user_id = user_auth_data['localId']
-        nuevo_usuario = None
+
         if rol_elegido == 'usuario':
-            nuevo_usuario = Usuario(user_id, nombre, email)
-        elif rol_elegido == 'propietaria':
-            nuevo_usuario = Propietaria(user_id, nombre, email)
-        if nuevo_usuario:
-            nuevo_usuario.save_to_db(db)
-            if admin_auth:
-                admin_auth.set_custom_user_claims(user_id, {'role': nuevo_usuario.rol})
-        user_session = auth.sign_in_with_email_and_password(email, password)
-        session['user_email'] = user_session['email']
-        session['user_id'] = user_session['localId']
-        session['role'] = nuevo_usuario.rol 
-        flash(f'¡Bienvenido, {nombre}! Tu cuenta de {nuevo_usuario.rol} ha sido creada.', 'success')
+            nuevo_usuario = Usuario(user_id, nombre, email, telefono)
+        else:
+            nuevo_usuario = Propietaria(user_id, nombre, email, telefono)
+
+        nuevo_usuario.save_to_db(db)
+
+        if admin_auth:
+            admin_auth.set_custom_user_claims(user_id, {'role': nuevo_usuario.rol})
+
+        session['user_email'] = email
+        session['user_id'] = user_id
+        session['role'] = nuevo_usuario.rol
+
+        flash(f'¡Bienvenido, {nombre}! Tu cuenta ha sido creada.', 'success')
         return redirect(url_for('home'))
+
     except Exception as e:
         error_message = str(e)
         if "EMAIL_EXISTS" in error_message:
