@@ -142,6 +142,10 @@ def signin():
     except Exception as e:
         flash('Credenciales incorrectas. Por favor, inténtalo de nuevo.', 'danger')
         return redirect(url_for('login'))
+    
+@app.route('/chats')
+def chats():
+    return render_template('chats.html')
 
 @app.route('/logout')
 def logout():
