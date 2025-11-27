@@ -112,6 +112,10 @@
                            class="btn btn-reservar w-100">
                             Reservar por WhatsApp
                         </a>
+                        <a href="{{ url_for('chats') }}?owner_id={{ experiencia.propietario_id }}&exp_id={{ experiencia_id }}&initial_text={{ ('Hola, estoy interesado en la experiencia: ' ~ experiencia.nombre)|urlencode }}" 
+                            class="btn btn-outline-success w-100 mt-2">
+                            Chatear con el propietario
+                        </a>
                         
                         {% if session['role'] == 'admin' or (experiencia.propietario_id == session['user_id']) %}
                             <hr class="my-4">

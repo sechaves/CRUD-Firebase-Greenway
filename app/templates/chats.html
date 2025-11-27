@@ -1,157 +1,123 @@
 {% extends "base.html" %}
-
 {% block title %}Chats{% endblock %}
 
 {% block styles %}
 <style>
-    body {
-        background-color: #111;
-    }
-
-    .chat-container {
-        height: calc(100vh - 120px);
-        margin-top: 20px;
-        border-radius: 12px;
-        overflow: hidden;
-        background-color: #000;
-        display: flex;
-        box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    /* Sidebar izquierda */
-    .chat-sidebar {
-        width: 360px;
-        background-color: #000;
-        border-right: 1px solid #222;
-        color: white;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .sidebar-header {
-        padding: 18px 20px;
-        border-bottom: 1px solid #222;
-        font-weight: 700;
-        font-size: 1.25rem;
-    }
-
-    .chat-list {
-        overflow-y: auto;
-        flex-grow: 1;
-    }
-
-    .chat-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 18px;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-    .chat-item:hover {
-        background-color: #111;
-    }
-
-    .chat-item img {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .chat-info {
-        display: flex;
-        flex-direction: column;
-        color: #eee;
-    }
-
-    .chat-info small {
-        color: #999;
-        font-size: 0.83rem;
-    }
-
-    /* Panel derecho */
-    .chat-empty {
-        flex-grow: 1;
-        background-color: #000;
-        color: #777;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .chat-empty i {
-        font-size: 60px;
-        margin-bottom: 12px;
-        color: #333;
-    }
-
-    .chat-empty h3 {
-        color: #ddd;
-        margin-bottom: 10px;
-    }
-
-    .chat-empty p {
-        color: #999;
-        max-width: 340px;
-    }
+  .chat-shell { height: calc(100vh - 140px); display:flex; gap:20px; margin-top:20px; }
+  .left-list { width:360px; background:#0b0b0b; color:#fff; border-radius:12px; overflow:auto; padding:12px; }
+  .chat-panel { flex:1; background:#000; color:#fff; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; }
+  .messages { flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+  .msg { max-width:70%; padding:10px 14px; border-radius:14px; }
+  .msg.me { background:#dfeee0; color:#111; align-self:flex-end; border-bottom-right-radius:4px; }
+  .msg.other { background:#1a73b8; color:#fff; align-self:flex-start; border-bottom-left-radius:4px; }
+  .composer { display:flex; gap:8px; padding:12px; border-top:1px solid #222; }
+  .composer input { flex:1; padding:10px 14px; border-radius:20px; border:none; background:#111; color:#fff; }
+  .composer button { background:var(--greenway-accent); color:#fff; border:none; padding:10px 16px; border-radius:10px; }
 </style>
 {% endblock %}
 
-
 {% block content %}
-
 <div class="container">
-    <div class="chat-container mx-auto">
-
-        <!-- ======== SIDEBAR IZQUIERDA ======== -->
-        <div class="chat-sidebar">
-
-            <div class="sidebar-header">
-                Mensajes
-            </div>
-
-            <div class="chat-list">
-
-                <!-- EJEMPLO DE ITEMS (luego lo reemplazamos con datos reales) -->
-                <div class="chat-item">
-                    <img src="https://i.pravatar.cc/150?img=13">
-                    <div class="chat-info">
-                        <strong>Persona 1</strong>
-                        <small>¿Cómo vas? · 32 min</small>
-                    </div>
-                </div>
-
-                <div class="chat-item">
-                    <img src="https://i.pravatar.cc/150?img=5">
-                    <div class="chat-info">
-                        <strong>Persona 2</strong>
-                        <small>Dale, bye · 10 h</small>
-                    </div>
-                </div>
-
-                <div class="chat-item">
-                    <img src="https://i.pravatar.cc/150?img=8">
-                    <div class="chat-info">
-                        <strong>Persona 3</strong>
-                        <small>Grabaron a Pablo · 16 h</small>
-                    </div>
-                </div>
-
-            </div>
-
+  <div class="chat-shell mx-auto">
+    <div class="left-list">
+      <h5 class="mb-3">Conversaciones</h5>
+      <!-- Aquí podrías listar otras conversaciones; por ahora mostramos la actual -->
+      {% if owner_id %}
+      <div class="d-flex align-items-center gap-2 p-2" style="border-radius:8px;background:#070707;">
+        <img src="https://i.pravatar.cc/100?u={{ owner_id }}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+        <div>
+          <div style="font-weight:700;">Propietario</div>
+          <small class="text-muted">ID: {{ owner_id }}</small>
         </div>
-
-        <!-- ======== PANEL DERECHO VACÍO ======== -->
-        <div class="chat-empty">
-            <i class="bi bi-send"></i>
-            <h3>Tus mensajes</h3>
-            <p>Envia fotos y mensajes privados cuando abras un chat.</p>
-        </div>
-
+      </div>
+      {% else %}
+      <p class="text-muted">Selecciona una experiencia y chatea con su propietario.</p>
+      {% endif %}
     </div>
+
+    <div class="chat-panel">
+      <div style="padding:14px 20px; border-bottom:1px solid #111;">
+        <strong>
+          {% if owner_id %} Chat con propietario: {{ owner_id }} {% else %} Mensajes {% endif %}
+        </strong>
+      </div>
+
+      <div id="messages" class="messages">
+        {% for m in messages %}
+          {% if m.sender_id == session.user_id %}
+            <div class="msg me"><strong>{{ m.sender_name }}</strong><br>{{ m.text }}</div>
+          {% else %}
+            <div class="msg other"><strong>{{ m.sender_name }}</strong><br>{{ m.text }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="composer">
+        <input id="msgInput" placeholder="Escribe un mensaje..." autocomplete="off">
+        <button id="sendBtn">Enviar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- Socket.IO client -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  (function(){
+    const socket = io(); // asume mismo origen
+    const room = "{{ room_id or '' }}";
+    const ownerId = "{{ owner_id or '' }}";
+    const expId = "{{ exp_id or '' }}";
+    const initialText = `{{ initial_text|e }}`;
+    const senderId = "{{ session.user_id }}";
+    const senderName = "{{ session.user_email.split('@')[0] if session.user_email else 'Usuario' }}";
+
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function appendMessage(obj) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + (obj.sender_id === senderId ? 'me' : 'other');
+      div.innerHTML = `<strong>${obj.sender_name}</strong><br>${obj.text}`;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    socket.on('connect', () => {
+      console.log('socket connected', socket.id);
+      if (room) {
+        socket.emit('join', { room: room, user_id: senderId, display_name: senderName });
+      }
+      // si viene initial_text, enviarlo como primer mensaje
+      if (initialText && room) {
+        const payload = { room, sender_id: senderId, sender_name: senderName, text: initialText, exp_id: expId };
+        socket.emit('send_message', payload);
+      }
+    });
+
+    socket.on('new_message', (data) => {
+      appendMessage(data);
+    });
+
+    socket.on('system', (d) => {
+      console.log('system:', d);
+    });
+
+    sendBtn.addEventListener('click', () => {
+      const text = inputEl.value.trim();
+      if (!text || !room) return;
+      const payload = { room, sender_id: senderId, sender_name: senderName, text, exp_id: expId };
+      socket.emit('send_message', payload);
+      inputEl.value = '';
+    });
+
+    inputEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    // auto-scroll on load
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  })();
+</script>
 {% endblock %}

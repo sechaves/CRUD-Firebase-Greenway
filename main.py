@@ -1,10 +1,16 @@
 import sys
 import os
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify 
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify
+from flask import Markup 
 from data.firebase_config import auth, db
 from data.firebase_admin import admin_auth
-from domain.models import Usuario, Propietaria, Admin, Persona
+from flask_socketio import SocketIO, join_room, leave_room, emit
+import time
+import json
+import datetime
+from domain.models import Persona, Usuario, Propietaria, Admin
+
 try:
     from domain.openai_chatbot import GreenwayChatbot
     chatbot_importado = True
@@ -16,6 +22,7 @@ except Exception as e:
     chatbot_importado = False
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 app.secret_key = "clave_secreta" 
 chatbot = None
 if chatbot_importado:
@@ -143,9 +150,52 @@ def signin():
         flash('Credenciales incorrectas. Por favor, inténtalo de nuevo.', 'danger')
         return redirect(url_for('login'))
     
+def build_room_id(user_a: str, user_b: str, exp_id: str) -> str:
+    # room determinista entre dos usuarios + experiencia
+    a, b = sorted([user_a, user_b])
+    return f"chat_{exp_id}_{a}_{b}"
+    
 @app.route('/chats')
+@login_required
 def chats():
-    return render_template('chats.html')
+    """
+    Página de chats. Puede recibir:
+      ?owner_id=<owner_user_id>&exp_id=<id_experiencia>&initial_text=...
+    """
+    owner_id = request.args.get('owner_id')
+    exp_id = request.args.get('exp_id')
+    initial_text = request.args.get('initial_text', '')  # opcional
+
+    user_id = session.get('user_id')
+
+    room_id = None
+    messages = []
+    if owner_id and exp_id and user_id:
+        room_id = build_room_id(user_id, owner_id, exp_id)
+
+        # cargar historial desde Firebase (si existe)
+        raw = db.child("chats").child(room_id).child("messages").get().val() or {}
+        # raw es dict de push keys -> msg dict. Convertir a lista ordenada por timestamp
+        msgs = []
+        for k, v in raw.items():
+            try:
+                ts = float(v.get('timestamp', 0))
+            except:
+                ts = 0
+            v['key'] = k
+            v['timestamp'] = ts
+            msgs.append(v)
+        msgs.sort(key=lambda x: x['timestamp'])
+        messages = msgs
+
+    # pasar room_id y mensajes (serializables) al template
+    return render_template('chats.html',
+                           session=session,
+                           room_id=room_id,
+                           owner_id=owner_id,
+                           exp_id=exp_id,
+                           initial_text=initial_text,
+                           messages=messages)
 
 @app.route('/logout')
 def logout():
@@ -446,6 +496,71 @@ def ask_chatbot():
     except Exception as e:
         print(f"Error en el chatbot: {e}")
         return jsonify({'error': 'Error interno al procesar tu pregunta.'}), 500
+    
+@socketio.on('connect')
+def handle_connect():
+    # opcional: podés usar session info o token para validar
+    print('Socket conectado:', request.sid)
+
+@socketio.on('join')
+def handle_join(data):
+    """
+    data = { "room": room_id, "user_id": ..., "display_name": ... }
+    """
+    room = data.get('room')
+    user_id = data.get('user_id')
+    if not room or not user_id:
+        return
+    join_room(room)
+    print(f"{user_id} se unió a {room}")
+    emit('system', {'msg': f'{data.get("display_name", "usuario")} se unió'}, to=room)
+
+@socketio.on('leave')
+def handle_leave(data):
+    room = data.get('room')
+    user_id = data.get('user_id')
+    leave_room(room)
+    emit('system', {'msg': f'{data.get("display_name","usuario")} salió'}, to=room)
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    """
+    data esperado:
+      {
+        "room": room_id,
+        "sender_id": "...",
+        "sender_name": "...",
+        "text": "...",
+        "exp_id": "..."
+      }
+    """
+    room = data.get('room')
+    text = data.get('text', '').strip()
+    if not room or text == '':
+        return
+
+    sender_id = data.get('sender_id')
+    sender_name = data.get('sender_name', 'Usuario')
+    exp_id = data.get('exp_id', '')
+
+    timestamp = time.time()
+
+    message_obj = {
+        'sender_id': sender_id,
+        'sender_name': sender_name,
+        'text': text,
+        'exp_id': exp_id,
+        'timestamp': timestamp
+    }
+
+    # Persistir en Firebase Realtime DB
+    try:
+        db.child("chats").child(room).child("messages").push(message_obj)
+    except Exception as e:
+        print("Error guardando mensaje en Firebase:", e)
+
+    # Emitir a la sala para todos los conectados
+    emit('new_message', message_obj, to=room)
 
 if __name__ == '__main__':
     if admin_auth is None:
@@ -456,6 +571,8 @@ if __name__ == '__main__':
         print("************************************")
         print("SDK de Admin de Firebase inicializado con éxito.")
         if chatbot_importado: print("Chatbot de OpenAI inicializado con éxito.")
-        print("*** Servidor Flask v3.0 (POO) LISTO ***")
+        print("*** Servidor Flask + SocketIO LISTO ***")
         print("************************************")
-        app.run(debug=True, port=5000)
+        # En producción Render pone PORT en env; en local usamos 5000
+        port = int(os.environ.get('PORT', 5000))
+        socketio.run(app, debug=True, host='0.0.0.0', port=port)
