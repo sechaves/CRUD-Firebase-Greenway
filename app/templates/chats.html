@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Chats{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #111;
+    }
+
+    .chat-container {
+        height: calc(100vh - 120px);
+        margin-top: 20px;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #000;
+        display: flex;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    /* Sidebar izquierda */
+    .chat-sidebar {
+        width: 360px;
+        background-color: #000;
+        border-right: 1px solid #222;
+        color: white;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #222;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .chat-list {
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+
+    .chat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    .chat-item:hover {
+        background-color: #111;
+    }
+
+    .chat-item img {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .chat-info {
+        display: flex;
+        flex-direction: column;
+        color: #eee;
+    }
+
+    .chat-info small {
+        color: #999;
+        font-size: 0.83rem;
+    }
+
+    /* Panel derecho */
+    .chat-empty {
+        flex-grow: 1;
+        background-color: #000;
+        color: #777;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .chat-empty i {
+        font-size: 60px;
+        margin-bottom: 12px;
+        color: #333;
+    }
+
+    .chat-empty h3 {
+        color: #ddd;
+        margin-bottom: 10px;
+    }
+
+    .chat-empty p {
+        color: #999;
+        max-width: 340px;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="chat-container mx-auto">
+
+        <!-- ======== SIDEBAR IZQUIERDA ======== -->
+        <div class="chat-sidebar">
+
+            <div class="sidebar-header">
+                Mensajes
+            </div>
+
+            <div class="chat-list">
+
+                <!-- EJEMPLO DE ITEMS (luego lo reemplazamos con datos reales) -->
+                <div class="chat-item">
+                    <img src="https://i.pravatar.cc/150?img=13">
+                    <div class="chat-info">
+                        <strong>Persona 1</strong>
+                        <small>¿Cómo vas? · 32 min</small>
+                    </div>
+                </div>
+
+                <div class="chat-item">
+                    <img src="https://i.pravatar.cc/150?img=5">
+                    <div class="chat-info">
+                        <strong>Persona 2</strong>
+                        <small>Dale, bye · 10 h</small>
+                    </div>
+                </div>
+
+                <div class="chat-item">
+                    <img src="https://i.pravatar.cc/150?img=8">
+                    <div class="chat-info">
+                        <strong>Persona 3</strong>
+                        <small>Grabaron a Pablo · 16 h</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ======== PANEL DERECHO VACÍO ======== -->
+        <div class="chat-empty">
+            <i class="bi bi-send"></i>
+            <h3>Tus mensajes</h3>
+            <p>Envia fotos y mensajes privados cuando abras un chat.</p>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -194,11 +194,8 @@
                 <div class="collapse navbar-collapse show" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Inicio</a></li>
-                        
-                        <!-- ================================== -->
-                        <!-- ¡¡LINK DE NAVEGACIÓN CORREGIDO!! -->
-                        <!-- ================================== -->
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('experiencias') }}">Experiencias</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('chats') }}">Chats</a></li>
                         
                         <!-- Lógica de Roles -->
                         {% if session.role == 'admin' %}
