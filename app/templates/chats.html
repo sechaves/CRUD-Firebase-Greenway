@@ -3,103 +3,18 @@
 
 {% block styles %}
 <style>
-  /* CONTENEDOR GENERAL */
-  .chat-shell { 
-    height: calc(100vh - 160px); 
-    display:flex; 
-    gap:20px; 
-    margin-top:20px; 
-  }
-
-  /* LISTA IZQUIERDA */
-  .left-list {
-    width:360px;
-    background:#ffffff;
-    color:#222;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-    padding:12px;
-    overflow:auto;
-  }
-
-  /* PANEL DEL CHAT */
-  .chat-panel {
-    flex:1;
-    background:#ffffff;
-    color:#222;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-    display:flex;
-    flex-direction:column;
-    overflow:hidden; 
-  }
-
-  /* LISTA DE MENSAJES */
-  .messages {
-    flex:1;
-    padding:20px;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-
-  /* MENSAJES */
-  .msg {
-    max-width:70%;
-    padding:12px 16px;
-    border-radius:14px;
-    font-size:0.95rem;
-    line-height:1.3;
-    box-shadow:0 1px 4px rgba(0,0,0,0.08);
-  }
-
-  .msg.me {
-    background:#e7fbe6;
-    color:#222;
-    align-self:flex-end;
-    border-bottom-right-radius:4px;
-  }
-
-  .msg.other {
-    background:#d9f2ff;
-    color:#222;
-    align-self:flex-start;
-    border-bottom-left-radius:4px;
-  }
-
-  /* ESCRITORIO */
-  .composer {
-    display:flex;
-    gap:10px;
-    padding:14px;
-    border-top:1px solid #e0e0e0;
-    background:#fafafa;
-  }
-
-  .composer input {
-    flex:1;
-    padding:12px 16px;
-    border-radius:20px;
-    border:1px solid #ccc;
-    background:white;
-    color:#222;
-  }
-
-  .composer input:focus {
-    outline:none;
-    border-color:var(--greenway-accent);
-    box-shadow:0 0 0 2px rgba(0,183,255,0.3);
-  }
-
-  .composer button {
-    background:var(--greenway-accent);
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:12px;
-    font-weight:600;
-  }
+  /* Mismos estilos que tenías, están perfectos */
+  .chat-shell { height: calc(100vh - 160px); display:flex; gap:20px; margin-top:20px; }
+  .left-list { width:360px; background:#ffffff; color:#222; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:12px; overflow:auto; }
+  .chat-panel { flex:1; background:#ffffff; color:#222; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:flex; flex-direction:column; overflow:hidden; }
+  .messages { flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+  .msg { max-width:70%; padding:12px 16px; border-radius:14px; font-size:0.95rem; line-height:1.3; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+  .msg.me { background:#e7fbe6; color:#222; align-self:flex-end; border-bottom-right-radius:4px; }
+  .msg.other { background:#d9f2ff; color:#222; align-self:flex-start; border-bottom-left-radius:4px; }
+  .composer { display:flex; gap:10px; padding:14px; border-top:1px solid #e0e0e0; background:#fafafa; }
+  .composer input { flex:1; padding:12px 16px; border-radius:20px; border:1px solid #ccc; background:white; color:#222; }
+  .composer input:focus { outline:none; border-color:var(--greenway-accent); box-shadow:0 0 0 2px rgba(0,183,255,0.3); }
+  .composer button { background:var(--greenway-accent); color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:600; cursor:pointer;}
 </style>
 {% endblock %}
 
@@ -107,127 +22,125 @@
 <div class="container">
   <div class="chat-shell mx-auto">
 
-    <!-- LISTA IZQUIERDA -->
     <div class="left-list">
       <h5 class="mb-3" style="font-weight:700;">Conversaciones</h5>
-
       {% if owner_id %}
       <div class="d-flex align-items-center gap-2 p-2" style="border-radius:8px;background:#f3f3f3;">
-        <img src="https://i.pravatar.cc/100?u={{ owner_id }}" 
+        <img src="https://ui-avatars.com/api/?name={{ owner_id }}&background=random" 
              style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
         <div>
-          <div style="font-weight:700;">Propietario</div>
-          <small class="text-muted">ID: {{ owner_id }}</small>
+          <div style="font-weight:700;">Chat Activo</div>
+          <small class="text-muted">Propietario ID: {{ owner_id }}</small>
         </div>
       </div>
       {% else %}
-      <p class="text-muted">Selecciona una experiencia para chatear con su propietario.</p>
+      <p class="text-muted">Ve a una experiencia y dale a "Contactar" para iniciar un chat.</p>
       {% endif %}
     </div>
 
-    <!-- CHAT PRINCIPAL -->
     <div class="chat-panel">
-
       <div style="padding:16px 20px; border-bottom:1px solid #e0e0e0; font-weight:700;">
-        {% if owner_id %} Chat con el propietario: {{ owner_id }} {% else %} Mensajes {% endif %}
+        {% if owner_id %} Chat Greenway {% else %} Mensajes {% endif %}
       </div>
 
       <div id="messages" class="messages">
-        {% for m in messages %}
-          {% if m.sender_id == session.user_id %}
-            <div class="msg me">
-              <strong>{{ m.sender_name }}</strong><br>{{ m.text }}
-            </div>
-          {% else %}
-            <div class="msg other">
-              <strong>{{ m.sender_name }}</strong><br>{{ m.text }}
-            </div>
-          {% endif %}
-        {% endfor %}
+        {% if not room_id %}
+            <div class="text-center text-muted mt-5">Selecciona una experiencia para chatear.</div>
+        {% endif %}
       </div>
 
+      {% if room_id %}
       <div class="composer">
         <input id="msgInput" placeholder="Escribe un mensaje..." autocomplete="off">
         <button id="sendBtn">Enviar</button>
       </div>
-
+      {% endif %}
     </div>
+
   </div>
 </div>
 
-<!-- SOCKET.IO -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-(function(){
+  // 1. Configuración de Firebase (Copiada de tu firebase_config.py)
+  // Es SEGURO tener esto en el frontend, son llaves públicas.
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvNgRDVftYYYOO4NntYy6yjo9hUOrH_CU",
+    authDomain: "greenway-450aa.firebaseapp.com",
+    databaseURL: "https://greenway-450aa-default-rtdb.firebaseio.com",
+    projectId: "greenway-450aa",
+    storageBucket: "greenway-450aa.firebasestorage.app",
+    messagingSenderId: "107049448583",
+    appId: "1:107049448583:web:2f8a6eece8d2e21d913422"
+  };
 
-    // ⚠️ CAMBIA ESTA URL POR TU BACKEND EN RENDER ⚠️
-    const socket = io("https://greenway-project.onrender.com", {
-        transports: ["websocket"],
-        withCredentials: true
+  // 2. Inicializar Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  // 3. Variables del usuario y sala (vienen de Flask/Jinja)
+  const ROOM_ID = "{{ room_id }}"; 
+  const MY_USER_ID = "{{ session.user_id }}";
+  const MY_NAME = "{{ session.user_email.split('@')[0] if session.user_email else 'Yo' }}";
+
+  const messagesDiv = document.getElementById('messages');
+  const msgInput = document.getElementById('msgInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  // 4. Función para enviar mensaje
+  function sendMessage() {
+    const text = msgInput.value.trim();
+    if (!text) return;
+
+    // Guardar en Firebase Realtime Database
+    // Ruta: chats/ROOM_ID/messages/...
+    db.ref('chats/' + ROOM_ID + '/messages').push({
+      sender_id: MY_USER_ID,
+      sender_name: MY_NAME,
+      text: text,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
     });
 
-    const room = "{{ room_id }}";
-    const expId = "{{ exp_id }}";
-    const initialText = `{{ initial_text|e }}`;
+    msgInput.value = ""; // Limpiar input
+  }
 
-    const senderId = "{{ session.user_id }}";
-    const senderName = "{{ session.user_email.split('@')[0] if session.user_email else 'Usuario' }}";
-
-    const messagesEl = document.getElementById('messages');
-    const inputEl = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
-
-    function appendMessage(obj) {
-      const div = document.createElement('div');
-      div.className = 'msg ' + (obj.sender_id == senderId ? 'me' : 'other');
-      div.innerHTML = `<strong>${obj.sender_name}</strong><br>${obj.text}`;
-      messagesEl.appendChild(div);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    socket.on("connect", () => {
-        if (room) {
-            socket.emit("join", {
-                room: room,
-                user_id: senderId,
-                display_name: senderName
-            });
-        }
-
-        if (initialText && room) {
-            socket.emit("send_message", {
-                room: room,
-                sender_id: senderId,
-                sender_name: senderName,
-                text: initialText,
-                exp_id: expId
-            });
-        }
+  // 5. Escuchar mensajes nuevos (Tiempo Real)
+  if (ROOM_ID && ROOM_ID !== "None") {
+    console.log("Conectando al chat:", ROOM_ID);
+    
+    // .on('child_added') se dispara por cada mensaje existente Y cada nuevo
+    db.ref('chats/' + ROOM_ID + '/messages').orderByChild('timestamp').on('child_added', (snapshot) => {
+      const data = snapshot.val();
+      renderMessage(data);
     });
 
-    socket.on("new_message", appendMessage);
-
-    sendBtn.addEventListener("click", () => {
-        const text = inputEl.value.trim();
-        if (!text || !room) return;
-
-        socket.emit("send_message", {
-            room: room,
-            sender_id: senderId,
-            sender_name: senderName,
-            text: text,
-            exp_id: expId
-        });
-
-        inputEl.value = "";
+    // Eventos del botón y Enter
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
     });
+  }
 
-    inputEl.addEventListener("keypress", e => {
-        if (e.key === "Enter") sendBtn.click();
-    });
+  // 6. Función para dibujar el mensaje en pantalla
+  function renderMessage(msg) {
+    const div = document.createElement('div');
+    // Si yo lo envié, clase 'me', si no 'other'
+    const isMe = (msg.sender_id === MY_USER_ID);
+    div.className = 'msg ' + (isMe ? 'me' : 'other');
+    
+    div.innerHTML = `
+      <small style="font-weight:bold; font-size:0.8rem">${msg.sender_name}</small><br>
+      ${msg.text}
+    `;
+    
+    messagesDiv.appendChild(div);
+    // Auto-scroll al fondo
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
 
-})();
 </script>
-
 {% endblock %}
