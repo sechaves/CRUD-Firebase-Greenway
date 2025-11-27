@@ -2,7 +2,7 @@ import sys
 import os
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify
-from flask import Markup 
+from markupsafe import Markup 
 from data.firebase_config import auth, db
 from data.firebase_admin import admin_auth
 from flask_socketio import SocketIO, join_room, leave_room, emit
