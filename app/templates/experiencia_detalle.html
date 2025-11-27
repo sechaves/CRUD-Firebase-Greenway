@@ -3,146 +3,124 @@
 
 {% block styles %}
 <style>
-    /* Estilo para que la imagen del carrusel tenga una altura fija */
-    .experiencia-imagen {
-        height: 500px; /* ¡Ajusta esta altura como quieras! */
-        object-fit: cover;
-        border-radius: 15px;
-    }
-    
-    /* Estilo para el "sidebar" de reserva */
-    .sidebar-reservas {
-        position: sticky;
-        top: 100px; /* Se "pega" 100px desde arriba cuando haces scroll */
-    }
-    
-    .precio-tag {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--greenway-primary);
-    }
-    .btn-reservar {
-        background-color: var(--greenway-accent);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 12px 25px;
-        font-size: 1.1rem;
-    }
-    .btn-reservar:hover {
-        background-color: #27a33e;
-        color: white;
-    }
+  .experiencia-imagen {
+    height: 500px;
+    object-fit: cover;
+    border-radius: 15px;
+  }
+  .sidebar-reservas { position: sticky; top: 100px; }
+  .precio-tag {
+    font-size:1.8rem; font-weight:700; color:var(--greenway-primary);
+  }
+  .btn-reservar {
+    background-color:var(--greenway-accent);
+    color:white;
+    border:none;
+    padding:12px 25px;
+    font-size:1.1rem;
+    font-weight:600;
+  }
+  .btn-reservar:hover { background:#00a2ff; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    
-    {% if experiencia %}
-    
-    <div class="row mb-3">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold">{{ experiencia.nombre }}</h1>
+{% if experiencia %}
+
+  <h1 class="display-5 fw-bold mb-4">{{ experiencia.nombre }}</h1>
+
+  <div class="row g-5">
+
+    <!-- IMÁGENES -->
+    <div class="col-lg-8">
+
+      <div id="carouselExperiencia" class="carousel slide shadow-sm mb-4">
+        <div class="carousel-indicators">
+          {% for img in experiencia.imagenes %}
+          <button type="button" data-bs-target="#carouselExperiencia" data-bs-slide-to="{{ loop.index0 }}" 
+                  class="{{ 'active' if loop.first else '' }}"></button>
+          {% endfor %}
         </div>
+
+        <div class="carousel-inner" style="border-radius: 15px;">
+          {% for img_url in experiencia.imagenes %}
+          <div class="carousel-item {{ 'active' if loop.first else '' }}">
+            <img src="{{ img_url }}" class="d-block w-100 experiencia-imagen">
+          </div>
+          {% endfor %}
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+
+      <hr class="my-4">
+      <h2 class="fw-bold">Descripción</h2>
+      <p class="fs-5" style="white-space: pre-wrap;">{{ experiencia.descripcion }}</p>
+
+      {% if experiencia.maps_embed_url %}
+      <hr class="my-4">
+      <h2 class="fw-bold">Ubicación</h2>
+      <div class="ratio ratio-16x9" style="border-radius:15px; overflow:hidden;">
+        {{ experiencia.maps_embed_url|safe }}
+      </div>
+      {% endif %}
+
     </div>
 
-    <div class="row g-5">
-        
-        <div class="col-lg-8">
-            
-            <div id="carouselExperiencia" class="carousel slide shadow-sm mb-4" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    {% for img in experiencia.imagenes %}
-                        <button type="button" data-bs-target="#carouselExperiencia" 
-                                data-bs-slide-to="{{ loop.index0 }}" 
-                                class="{{ 'active' if loop.first else '' }}" 
-                                aria-current="true" aria-label="Slide {{ loop.index }}">
-                        </button>
-                    {% endfor %}
-                </div>
-                <div class="carousel-inner" style="border-radius: 15px;">
-                    {% for img_url in experiencia.imagenes %}
-                    <div class="carousel-item {{ 'active' if loop.first else '' }}">
-                        <img src="{{ img_url }}" class="d-block w-100 experiencia-imagen" alt="Foto de {{ experiencia.nombre }}">
-                    </div>
-                    {% else %}
-                    <div class="carousel-item active">
-                        <img src="https://via.placeholder.com/800x500.png?text=Sin+Imagen" class="d-block w-100 experiencia-imagen" alt="Sin Imagen">
-                    </div>
-                    {% endfor %}
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExperiencia" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+    <!-- SIDEBAR -->
+    <div class="col-lg-4">
+      <div class="sidebar-reservas">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="precio-tag">${{ "{:,.0f}".format(experiencia.precio_noche) }} COP</span>
+              <span class="text-muted">por noche</span>
             </div>
-            
-            <hr class="my-4">
-            <h2 class="fw-bold">Descripción</h2>
-            <p class="fs-5" style="white-space: pre-wrap;">{{ experiencia.descripcion }}</p>
-            {% if experiencia.maps_embed_url %}
-            <hr class="my-4">
-            <h2 class="fw-bold">Ubicación</h2>
 
-            <div class="ratio ratio-16x9" style="border-radius: 15px; overflow: hidden;">
-                {{ experiencia.maps_embed_url|safe }}
+            {% set wpp_number = '573001234567' %}
+            <a href="https://wa.me/{{ wpp_number }}?text={{ ('Hola, estoy interesado en reservar: ' ~ experiencia.nombre)|urlencode }}"
+               class="btn btn-reservar w-100">Reservar por WhatsApp</a>
+
+            <a href="{{ url_for('chats') }}?owner_id={{ experiencia.propietario_id }}&exp_id={{ experiencia_id }}&initial_text={{ ('Hola, estoy interesado en la experiencia: ' ~ experiencia.nombre)|urlencode }}"
+               class="btn btn-outline-success w-100 mt-2">
+               Chatear con el propietario
+            </a>
+
+            {% if session['role'] == 'admin' or experiencia.propietario_id == session['user_id'] %}
+            <hr class="my-4">
+            <h5 class="text-muted">Panel de Propietario</h5>
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('admin_edit_experiencia', experiencia_id=experiencia_id) }}" class="btn btn-outline-primary">
+                Editar
+              </a>
+
+              <form action="{{ url_for('admin_delete_experiencia', experiencia_id=experiencia_id) }}" method="POST"
+                    onsubmit="return confirm('¿Eliminar experiencia?');">
+                <button class="btn btn-outline-danger">Eliminar</button>
+              </form>
             </div>
-        {% endif %}
+            {% endif %}
 
-        </div> <div class="col-lg-4">
-            <div class="sidebar-reservas"> <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="precio-tag">
-                                ${{ "{:,.0f}".format(experiencia.precio_noche) }} COP
-                            </span>
-                            <span class="text-muted">/ por noche</span>
-                        </div>
-
-                        {% set wpp_number = '573001234567' %}
-                        {% set wpp_message = "Hola, estoy interesado en reservar la experiencia: " ~ experiencia.nombre %}
-                        <a href="https://wa.me/{{ wpp_number }}?text={{ wpp_message|urlencode }}" 
-                           target="_blank" 
-                           class="btn btn-reservar w-100">
-                            Reservar por WhatsApp
-                        </a>
-                        <a href="{{ url_for('chats') }}?owner_id={{ experiencia.propietario_id }}&exp_id={{ experiencia_id }}&initial_text={{ ('Hola, estoy interesado en la experiencia: ' ~ experiencia.nombre)|urlencode }}" 
-                            class="btn btn-outline-success w-100 mt-2">
-                            Chatear con el propietario
-                        </a>
-                        
-                        {% if session['role'] == 'admin' or (experiencia.propietario_id == session['user_id']) %}
-                            <hr class="my-4">
-                            <h5 class="text-muted mb-3">Panel de Propietario</h5>
-                            <div class="d-grid gap-2">
-                                <a href="{{ url_for('admin_edit_experiencia', experiencia_id=experiencia_id) }}" 
-                                   class="btn btn-outline-primary">
-                                    Editar esta Experiencia
-                                </a>
-                                <form action="{{ url_for('admin_delete_experiencia', experiencia_id=experiencia_id) }}" 
-                                      method="POST" 
-                                      class="d-grid"
-                                      onsubmit="return confirm('¿Estás seguro de que quieres ELIMINAR esta experiencia?');">
-                                    <button type="submit" class="btn btn-outline-danger">
-                                        Eliminar esta Experiencia
-                                    </button>
-                                </form>
-                            </div>
-                        {% endif %}
-                        </div>
-                </div> </div> </div> </div> {% else %}
-    <div class="text-center">
-        <h2>Oops!</h2>
-        <p>Parece que esta experiencia no existe o no se pudo cargar.</p>
-        <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al Inicio</a>
+          </div>
+        </div>
+      </div>
     </div>
-    {% endif %}
 
+  </div>
+
+{% else %}
+  <div class="text-center">
+    <h2>Oops!</h2>
+    <p>La experiencia no existe.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Volver al inicio</a>
+  </div>
+{% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: greenway-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      PORT: 10000
