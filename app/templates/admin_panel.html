@@ -41,7 +41,7 @@
                         <table class="table table-striped table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col">ID / Teléfono</th> 
+                                    <th scope="col">Teléfono</th> 
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Email</th>
                                 </tr>
@@ -49,8 +49,8 @@
                             <tbody>
                                 {% for user_id, user in admins.items() %}
                                 <tr>
-                                    <td class="font-monospace small">
-                                        {{ user.telefono if user.telefono else user_id }}
+                                    <td class="font-monospace small text-primary">
+                                        {{ user.telefono if user.telefono else 'Sin dato' }}
                                     </td>
                                     <td>{{ user.nombre }}</td>
                                     <td>{{ user.email }}</td>
@@ -144,36 +144,50 @@
         <div class="col-12">
             <h2 class="mb-3">Moderar Experiencias</h2>
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th scope="col">Nombre</th>
                             <th scope="col">Precio</th>
-                            <th scope="col">Propietario (ID)</th>
+                            <th scope="col">Propietario</th>
                             <th scope="col" class="text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for exp_id, exp_data in experiencias.items() %}
                         <tr>
-                            <td>{{ exp_data.nombre }}</td>
+                            <td class="fw-bold">{{ exp_data.nombre }}</td>
                             <td>${{ "{:,.0f}".format(exp_data.precio_noche) }}</td>
-                            <td class="font-monospace small">{{ exp_data.propietario_id }}</td>
+                            
+                            <td>
+                                {% if exp_data.propietario_id in propietarios %}
+                                    <i class="bi bi-person-fill text-muted"></i> 
+                                    {{ propietarios[exp_data.propietario_id].nombre }}
+                                {% elif exp_data.propietario_id in usuarios %}
+                                    {{ usuarios[exp_data.propietario_id].nombre }}
+                                {% else %}
+                                    <span class="text-muted fst-italic">Desconocido</span>
+                                {% endif %}
+                            </td>
                             
                             <td class="text-end actions-cell">
                                 <a href="{{ url_for('admin_edit_experiencia', experiencia_id=exp_id) }}" 
-                                   class="btn btn-sm btn-primary">Editar</a>
+                                   class="btn btn-sm btn-primary">
+                                   <i class="bi bi-pencil-square"></i> Editar
+                                </a>
                                 
                                 <form action="{{ url_for('admin_delete_experiencia', experiencia_id=exp_id) }}" 
                                       method="POST" 
                                       class="d-inline"
                                       onsubmit="return confirm('¿Eliminar experiencia? Irreversible.');">
-                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="text-center text-muted">No hay experiencias.</td></tr>
+                        <tr><td colspan="4" class="text-center text-muted">No hay experiencias.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
