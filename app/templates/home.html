@@ -56,7 +56,9 @@
         'LaMesa': 'https://cloudfront-us-east-1.images.arcpublishing.com/infobae/E7RJPE5B7RFFZMAKBKC24NQJS4.jpg', 
         'Medellin': 'https://happygringo.com/wp-content/uploads/2021/08/medellin.jpg',
         'Cocora': 'https://i0.wp.com/passporterapp.com/es/blog/wp-content/uploads/2024/05/planificar-viaje-al-Valle-del-Cocora.jpeg?resize=1140%2C760&ssl=1',
-        'Chicamocha': 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Ca%C3%B1on_del_Chicamocha.jpeg'
+        'Chicamocha': 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Ca%C3%B1on_del_Chicamocha.jpeg',
+        'Quindio': 'https://q-xx.bstatic.com/xdata/images/hotel/840x460/600082455.jpg?k=9c1adbeea6c7c369ba5ed7fc8bda4f4a93598125e423f5da4a397c0f402c7652&o=',
+        'CocoraPro': 'https://www.wendywutours.com.au/resource/upload/2125/cocora-valley-banner.jpg.webp'
     } %}
     <div class="hero-section">
         <div id="hero-background-slider">
@@ -91,16 +93,17 @@
                                 <div class="event-card-image">
                                     
                                     {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
-                                    
+
                                     {% if experiencia.nombre in correcciones_manuales %}
                                         {% set image_src = correcciones_manuales[experiencia.nombre] %}
-                                    
+
                                     {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
-                                        {% set image_src = experiencia.imagenes[0] %}
-                                    
+                                        {% set image_src = url_for('static', filename='images/' ~ experiencia.imagenes[0]) %}
+
                                     {% elif experiencia.imagen_url %}
                                         {% set image_src = experiencia.imagen_url %}
                                     {% endif %}
+
 
                                     <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" onerror="this.src='https://via.placeholder.com/400x300.png?text=Error+Foto'">
 
