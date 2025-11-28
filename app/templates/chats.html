@@ -3,7 +3,6 @@
 
 {% block styles %}
 <style>
-  /* Mismos estilos que tenías, están perfectos */
   .chat-shell { height: calc(100vh - 160px); display:flex; gap:20px; margin-top:20px; }
   .left-list { width:360px; background:#ffffff; color:#222; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:12px; overflow:auto; }
   .chat-panel { flex:1; background:#ffffff; color:#222; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:flex; flex-direction:column; overflow:hidden; }
@@ -15,6 +14,15 @@
   .composer input { flex:1; padding:12px 16px; border-radius:20px; border:1px solid #ccc; background:white; color:#222; }
   .composer input:focus { outline:none; border-color:var(--greenway-accent); box-shadow:0 0 0 2px rgba(0,183,255,0.3); }
   .composer button { background:var(--greenway-accent); color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:600; cursor:pointer;}
+  
+  /* Estilo para los items de la lista */
+  .chat-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 8px; cursor: pointer;
+      transition: background 0.2s; border-bottom: 1px solid #eee;
+  }
+  .chat-item:hover { background: #f5f5f5; }
+  .chat-item.active { background: #e3f2fd; }
 </style>
 {% endblock %}
 
@@ -23,29 +31,28 @@
   <div class="chat-shell mx-auto">
 
     <div class="left-list">
-      <h5 class="mb-3" style="font-weight:700;">Conversaciones</h5>
-      {% if owner_id %}
-      <div class="d-flex align-items-center gap-2 p-2" style="border-radius:8px;background:#f3f3f3;">
-        <img src="https://ui-avatars.com/api/?name={{ owner_id }}&background=random" 
-             style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
-        <div>
-          <div style="font-weight:700;">Chat Activo</div>
-          <small class="text-muted">Propietario ID: {{ owner_id }}</small>
-        </div>
+      <h5 class="mb-3" style="font-weight:700;">Tus Conversaciones</h5>
+      
+      <div id="chat-list-container">
+          <p class="text-center text-muted mt-4"><small>Cargando chats...</small></p>
       </div>
-      {% else %}
-      <p class="text-muted">Ve a una experiencia y dale a "Contactar" para iniciar un chat.</p>
-      {% endif %}
     </div>
 
     <div class="chat-panel">
       <div style="padding:16px 20px; border-bottom:1px solid #e0e0e0; font-weight:700;">
-        {% if owner_id %} Chat Greenway {% else %} Mensajes {% endif %}
+        {% if owner_id %} 
+            Chat con: <span class="text-primary">{{ owner_id }}</span>
+        {% else %} 
+            Selecciona un chat 
+        {% endif %}
       </div>
 
       <div id="messages" class="messages">
         {% if not room_id %}
-            <div class="text-center text-muted mt-5">Selecciona una experiencia para chatear.</div>
+            <div class="text-center text-muted mt-5">
+                <i class="bi bi-chat-dots fs-1"></i>
+                <p>Selecciona una conversación a la izquierda para empezar.</p>
+            </div>
         {% endif %}
       </div>
 
@@ -64,8 +71,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  // 1. Configuración de Firebase (Copiada de tu firebase_config.py)
-  // Es SEGURO tener esto en el frontend, son llaves públicas.
+  // 1. Configuración (PÚBLICA Y SEGURA)
   const firebaseConfig = {
     apiKey: "AIzaSyCvNgRDVftYYYOO4NntYy6yjo9hUOrH_CU",
     authDomain: "greenway-450aa.firebaseapp.com",
@@ -76,28 +82,97 @@
     appId: "1:107049448583:web:2f8a6eece8d2e21d913422"
   };
 
-  // 2. Inicializar Firebase
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
   const db = firebase.database();
 
-  // 3. Variables del usuario y sala (vienen de Flask/Jinja)
+  // Variables de sesión
   const ROOM_ID = "{{ room_id }}"; 
   const MY_USER_ID = "{{ session.user_id }}";
-  const MY_NAME = "{{ session.user_email.split('@')[0] if session.user_email else 'Yo' }}";
+  const MY_NAME = "{{ session.user_email.split('@')[0] if session.user_email else 'Usuario' }}";
 
+  // Elementos DOM
   const messagesDiv = document.getElementById('messages');
   const msgInput = document.getElementById('msgInput');
   const sendBtn = document.getElementById('sendBtn');
+  const chatListContainer = document.getElementById('chat-list-container');
 
-  // 4. Función para enviar mensaje
+  // ==========================================
+  // PARTE 1: LISTAR LOS CHATS A LA IZQUIERDA
+  // ==========================================
+  
+  // Escuchamos TODO el nodo 'chats' (en una app real gigante esto se optimiza, 
+  // pero para tu proyecto está perfecto y funciona rápido).
+  db.ref('chats').on('value', (snapshot) => {
+      chatListContainer.innerHTML = ""; // Limpiar lista
+      const allChats = snapshot.val();
+
+      if (!allChats) {
+          chatListContainer.innerHTML = "<p class='text-muted small'>No tienes chats aún.</p>";
+          return;
+      }
+
+      let foundAny = false;
+
+      // Recorremos todos los chats que existen en la base de datos
+      // Las llaves son tipo: "chat_EXPID_USERA_USERB"
+      Object.keys(allChats).forEach(key => {
+          
+          // Verificamos si YO soy parte de ese chat (si mi ID está en el nombre de la sala)
+          if (key.includes(MY_USER_ID)) {
+              foundAny = true;
+              
+              // Desglosamos el nombre para sacar info: chat_EXPID_USERA_USERB
+              const parts = key.split('_');
+              // parts[0] = "chat"
+              // parts[1] = EXP_ID
+              // parts[2] = ID_UNO
+              // parts[3] = ID_DOS
+
+              const expId = parts[1];
+              const userA = parts[2];
+              const userB = parts[3];
+
+              // Identificar quién es "el otro"
+              let otherUserId = (userA === MY_USER_ID) ? userB : userA;
+
+              // Crear el elemento HTML del botón
+              const div = document.createElement('div');
+              const isActive = (key === ROOM_ID) ? 'active' : '';
+              div.className = `chat-item ${isActive}`;
+              div.innerHTML = `
+                  <img src="https://ui-avatars.com/api/?name=${otherUserId}&background=random" 
+                       style="width:40px;height:40px;border-radius:50%;">
+                  <div style="overflow:hidden;">
+                      <div style="font-weight:bold;font-size:0.9rem;">Usuario: ${otherUserId.substring(0,10)}...</div>
+                      <small class="text-muted" style="font-size:0.75rem;">Exp: ${expId}</small>
+                  </div>
+              `;
+
+              // Al hacer clic, recargamos la página con los parámetros correctos
+              div.onclick = () => {
+                  window.location.href = `/chats?owner_id=${otherUserId}&exp_id=${expId}`;
+              };
+
+              chatListContainer.appendChild(div);
+          }
+      });
+
+      if (!foundAny) {
+          chatListContainer.innerHTML = "<p class='text-muted small p-2'>No participas en ningún chat todavía.</p>";
+      }
+  });
+
+
+  // ==========================================
+  // PARTE 2: EL CHAT ACTIVO (DERECHA)
+  // ==========================================
+
   function sendMessage() {
     const text = msgInput.value.trim();
     if (!text) return;
 
-    // Guardar en Firebase Realtime Database
-    // Ruta: chats/ROOM_ID/messages/...
     db.ref('chats/' + ROOM_ID + '/messages').push({
       sender_id: MY_USER_ID,
       sender_name: MY_NAME,
@@ -105,41 +180,43 @@
       timestamp: firebase.database.ServerValue.TIMESTAMP
     });
 
-    msgInput.value = ""; // Limpiar input
+    msgInput.value = ""; 
   }
 
-  // 5. Escuchar mensajes nuevos (Tiempo Real)
+  function renderMessage(msg) {
+    const div = document.createElement('div');
+    const isMe = (msg.sender_id === MY_USER_ID);
+    div.className = 'msg ' + (isMe ? 'me' : 'other');
+    
+    // Convertir timestamp a hora legible
+    const date = new Date(msg.timestamp);
+    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <small style="font-weight:bold; font-size:0.8rem; margin-right:8px;">${msg.sender_name}</small>
+          <small style="font-size:0.65rem; opacity:0.7;">${timeStr}</small>
+      </div>
+      ${msg.text}
+    `;
+    
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // Si hay un chat seleccionado, cargamos los mensajes
   if (ROOM_ID && ROOM_ID !== "None") {
     console.log("Conectando al chat:", ROOM_ID);
     
-    // .on('child_added') se dispara por cada mensaje existente Y cada nuevo
     db.ref('chats/' + ROOM_ID + '/messages').orderByChild('timestamp').on('child_added', (snapshot) => {
       const data = snapshot.val();
       renderMessage(data);
     });
 
-    // Eventos del botón y Enter
     sendBtn.addEventListener('click', sendMessage);
     msgInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
-  }
-
-  // 6. Función para dibujar el mensaje en pantalla
-  function renderMessage(msg) {
-    const div = document.createElement('div');
-    // Si yo lo envié, clase 'me', si no 'other'
-    const isMe = (msg.sender_id === MY_USER_ID);
-    div.className = 'msg ' + (isMe ? 'me' : 'other');
-    
-    div.innerHTML = `
-      <small style="font-weight:bold; font-size:0.8rem">${msg.sender_name}</small><br>
-      ${msg.text}
-    `;
-    
-    messagesDiv.appendChild(div);
-    // Auto-scroll al fondo
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
 </script>
