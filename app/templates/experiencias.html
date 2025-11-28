@@ -1,119 +1,93 @@
 {% extends "base.html" %}
-
-{% block title %}Nuestras Experiencias{% endblock %}
-
-{% block styles %}
-<style>
-    .section-title {
-        font-weight: 900;
-        font-size: 2.5rem;
-        color: var(--greenway-text);
-        margin-bottom: 10px;
-    }
-    .section-subtitle {
-        font-size: 1.1rem;
-        color: #555;
-        margin-bottom: 50px;
-    }
-    .event-card {
-        background-color: #fff;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease-in-out;
-        height: 100%; 
-        display: flex;
-        flex-direction: column;
-    }
-    .event-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    .event-card-image img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-    }
-    .event-card-content {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; }
-    .event-card-content .price { font-size: 1.1rem; font-weight: 600; color: #444; margin-top: 5px; }
-    
-    .card-footer-custom {
-        margin-top: auto; 
-        border-top: 1px solid #eee;
-        padding-top: 15px;
-        padding-left: 20px; /* Alineado con el contenido */
-        padding-right: 20px;
-        padding-bottom: 20px;
-    }
-    .btn-greenway-details {
-        background-color: var(--greenway-primary);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-greenway-details:hover {
-        background-color: #8db303; 
-        color: white;
-    }
-</style>
-{% endblock %}
+{% block title %}Explorar{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     
-    <div class="row text-center mb-5">
-        <div class="col-12">
-            <h2 class="section-title">Descubre Nuestras Experiencias</h2>
-            <p class="section-subtitle">Experiencias únicos en nuestro santuario de abejas.</p>
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold">Todas las Experiencias</h2>
+            <p class="text-muted">Descubre lugares únicos en el Santuario.</p>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="input-group input-group-lg shadow-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Buscar por nombre...">
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        
-        <!-- 
-          Iteramos sobre los 'hospedajes' que pasamos desde main.py.
-          Usamos la sintaxis de Python para formatear el precio.
-        -->
+    <div class="row g-4" id="experiencias-grid">
         {% for experiencia in experiencias %}
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="event-card w-100">
-                    <div class="event-card-image">
-                        <img src="{{ (experiencia.imagenes[0]) if experiencia.imagenes else 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' }}" alt="{{ experiencia.nombre }}">
+        <div class="col-md-6 col-lg-4 experiencia-item"> <div class="card h-100 shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
+                
+                <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}">
+                    <img src="{{ (experiencia.imagenes[0]) if experiencia.imagenes else 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' }}" 
+                         class="card-img-top" alt="{{ experiencia.nombre }}" 
+                         style="height: 250px; object-fit: cover;">
+                </a>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold text-dark mb-0">{{ experiencia.nombre }}</h5>
+                        <span class="badge bg-light text-dark border">${{ "{:,.0f}".format(experiencia.precio_noche) }}</span>
                     </div>
-                    <div class="event-card-content">
-                        <h5>{{ experiencia.nombre }}</h5>
-                        <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP / noche</p>
-                        <p class="text-muted">
-                            <!-- trunca la descripción a 100 caracteres -->
-                            {{ experiencia.descripcion | truncate(100) }}
-                        </p>
-                    </div>
-                    <div class="card-footer-custom">
-                        <!-- Enlazamos a la página de detalle con el ID del experiencia -->
-                        <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
-                            Ver Detalles y Reservar
+                    
+                    <p class="card-text text-muted small text-truncate">
+                        {{ experiencia.descripcion }}
+                    </p>
+                    
+                    <div class="d-grid mt-3">
+                        <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" 
+                           class="btn btn-outline-primary fw-bold">
+                            Ver Detalles
                         </a>
                     </div>
                 </div>
             </div>
-        
+        </div>
         {% else %}
-            <!-- Esto se muestra si no hay NINGÚN hospedaje en la DB -->
-            <div class="col-12 text-center">
-                <h3 class="text-muted">¡Oh, no!</h3>
-                <p class="fs-5">Parece que nuestros propietarios aún no han registrado ningúna experiencia.</p>
-                <p>¡Vuelve pronto!</p>
-            </div>
-        
+        <div class="col-12 text-center py-5">
+            <h3 class="text-muted">No hay experiencias registradas aún.</h3>
+        </div>
         {% endfor %}
-        
-    </div> 
-</div> 
+    </div>
+    
+    <div id="no-results" class="text-center py-5 d-none">
+        <i class="bi bi-search fs-1 text-muted"></i>
+        <h4 class="text-muted mt-3">No encontramos experiencias con ese nombre.</h4>
+    </div>
+
+</div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const query = this.value.toLowerCase();
+        const items = document.querySelectorAll('.experiencia-item');
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            // Buscamos el título dentro de la tarjeta
+            const title = item.querySelector('.card-title').textContent.toLowerCase();
+            
+            if (title.includes(query)) {
+                item.classList.remove('d-none'); // Mostrar
+                visibleCount++;
+            } else {
+                item.classList.add('d-none'); // Ocultar
+            }
+        });
+
+        // Mostrar mensaje si no hay resultados
+        const noResults = document.getElementById('no-results');
+        if (visibleCount === 0) {
+            noResults.classList.remove('d-none');
+        } else {
+            noResults.classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}

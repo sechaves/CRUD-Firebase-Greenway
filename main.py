@@ -360,17 +360,35 @@ def crear_experiencia_submit():
 def experiencia_detalle(experiencia_id):
     try:
         experiencia_data = db.child("experiencias").child(experiencia_id).get().val()
+        
         if not experiencia_data:
             flash('Esa experiencia no existe.', 'danger')
             return redirect(url_for('home'))
+
+        # --- LÓGICA NUEVA: BUSCAR NOMBRE DEL DUEÑO ---
+        owner_id = experiencia_data.get('propietario_id')
+        owner_name = "Anfitrión Greenway" # Nombre por defecto si no se encuentra
+
+        if owner_id:
+            # 1. Buscamos en propietarios
+            persona = db.child("propietarios").child(owner_id).get().val()
+            if not persona:
+                # 2. Si no aparece, buscamos en usuarios (por si acaso un admin o user la creó)
+                persona = db.child("usuarios").child(owner_id).get().val()
+            
+            if persona and 'nombre' in persona:
+                owner_name = persona['nombre']
+        # ---------------------------------------------
+
         return render_template('experiencia_detalle.html', 
                                session=session, 
                                experiencia=experiencia_data,
-                               experiencia_id=experiencia_id) 
+                               experiencia_id=experiencia_id,
+                               owner_name=owner_name) # ¡Pasamos el nombre a la plantilla!
+        
     except Exception as e:
         flash(f'Error al cargar: {e}', 'danger')
         return redirect(url_for('home'))
-
 @app.route('/admin-panel')
 @login_required
 @role_required('admin')
@@ -488,6 +506,12 @@ def ask_chatbot():
         return jsonify({'respuesta': respuesta})
     except Exception as e:
         return jsonify({'error': 'Error interno.'}), 500
+    
+    # --- MANEJO DE ERRORES ---
+@app.errorhandler(404)
+def page_not_found(e):
+    # Nota: Pasamos 'session' para que la navbar funcione bien (mostrar login/logout)
+    return render_template('404.html', session=session), 404
 
 # --- Main ---
 if __name__ == '__main__':

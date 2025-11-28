@@ -31,7 +31,6 @@
         color: white;
         transform: translateY(-2px);
     }
-    /* Estilo para el mapa responsive */
     .map-container iframe {
         width: 100% !important;
         height: 100% !important;
@@ -48,7 +47,10 @@
     <div class="row mb-3">
         <div class="col-12">
             <h1 class="display-5 fw-bold">{{ experiencia.nombre }}</h1>
-            <p class="lead text-muted">Anfitrión: {{ experiencia.propietario_id }}</p>
+            
+            <p class="lead text-muted">
+                Anfitrión: <span class="fw-bold text-dark">{{ owner_name }}</span>
+            </p>
         </div>
     </div>
 

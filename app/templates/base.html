@@ -428,6 +428,16 @@
 
     <!-- Bloque para scripts específicos de cada página -->
     {% block scripts %}{% endblock %}
+    <script>
+    // Cerrar alertas automáticamente después de 4 segundos
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 4000); // 4000 milisegundos = 4 segundos
+</script>
 
 </body>
 </html>
