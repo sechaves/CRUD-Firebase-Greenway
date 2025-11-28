@@ -4,7 +4,7 @@
 
 {% block styles %}
 <style>
-    /* --- Estilos del Hero (sin cambios) --- */
+    /* --- Estilos del Hero --- */
     .hero-section {
         height: 80vh;
         position: relative;
@@ -22,97 +22,42 @@
     .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
     .hero-sub { font-weight: 500; font-size: 1.1rem; }
 
-    /* --- ESTILOS DE SECCIÓN DE ALOJAMIENTOS --- */
-    .events-section {
-        padding: 60px 0;
-        position: relative;
-        overflow: hidden; 
-    }
-    .section-title {
-        font-weight: 900;
-        font-size: 2.5rem;
-        color: var(--greenway-text);
-        margin-bottom: 10px;
-    }
-    .section-subtitle {
-        font-size: 1.1rem;
-        color: #555;
-        margin-bottom: 50px;
-    }
+    /* --- ESTILOS DE SECCIÓN --- */
+    .events-section { padding: 60px 0; position: relative; overflow: hidden; }
+    .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; }
+    .section-subtitle { font-size: 1.1rem; color: #555; margin-bottom: 50px; }
     
-    /* --- Estilos para las tarjetas --- */
+    /* --- Estilos Tarjetas --- */
     .event-card {
-        background-color: #fff;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease-in-out;
-        height: 100%; 
-        display: flex;
-        flex-direction: column;
+        background-color: #fff; border-radius: 20px; overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: all 0.3s ease-in-out;
+        height: 100%; display: flex; flex-direction: column;
     }
-    .event-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    .event-card-image {
-        height: 250px; /* Altura fija para uniformidad */
-        overflow: hidden;
-        background-color: #f0f0f0;
-    }
-    .event-card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .event-card-content {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
+    .event-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); }
+    .event-card-image { height: 250px; overflow: hidden; background-color: #f0f0f0; }
+    .event-card-image img { width: 100%; height: 100%; object-fit: cover; }
+    .event-card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
     .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; margin-bottom: 0.5rem;}
     .event-card-content .price { font-size: 1.1rem; font-weight: 600; color: #444; margin-top: 5px; }
+    .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 15px 20px 20px 20px; }
+    .btn-greenway-details { background-color: var(--greenway-primary); color: white; font-weight: 600; transition: all 0.3s ease; }
+    .btn-greenway-details:hover { background-color: #8db303; color: white; }
     
-    .card-footer-custom {
-        margin-top: auto; 
-        border-top: 1px solid #eee;
-        padding: 15px 20px 20px 20px;
-    }
-    .btn-greenway-details {
-        background-color: var(--greenway-primary);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-greenway-details:hover {
-        background-color: #8db303; 
-        color: white;
-    }
-    
-    /* --- Estilos para el Carrusel Horizontal --- */
-    .carousel-container {
-        overflow-x: auto;
-        padding-bottom: 30px; 
-        padding-left: 10px;
-        /* Ocultar barra de scroll en navegadores modernos */
-        scrollbar-width: thin; 
-    }
-    .carousel-track {
-        display: flex;
-        gap: 25px; 
-        width: max-content; 
-    }
-    .carousel-card {
-        width: 350px; 
-        flex-shrink: 0; 
-        display: inline-block;
-        white-space: normal;
-    }
+    /* --- Carrusel --- */
+    .carousel-container { overflow-x: auto; padding-bottom: 30px; padding-left: 10px; scrollbar-width: thin; }
+    .carousel-track { display: flex; gap: 25px; width: max-content; }
+    .carousel-card { width: 350px; flex-shrink: 0; display: inline-block; white-space: normal; }
 </style>
 {% endblock %}
 
 {% block content %}
+
+    {% set correcciones_manuales = {
+        'LaMesa': 'https://cloudfront-us-east-1.images.arcpublishing.com/infobae/E7RJPE5B7RFFZMAKBKC24NQJS4.jpg', 
+        'Medellin': 'https://happygringo.com/wp-content/uploads/2021/08/medellin.jpg',
+        'Cocora': 'https://i0.wp.com/passporterapp.com/es/blog/wp-content/uploads/2024/05/planificar-viaje-al-Valle-del-Cocora.jpeg?resize=1140%2C760&ssl=1',
+        'Chicamocha': 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Ca%C3%B1on_del_Chicamocha.jpeg'
+    } %}
     <div class="hero-section">
         <div id="hero-background-slider">
             <div class="hero-slide"></div>
@@ -147,19 +92,24 @@
                                     
                                     {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
                                     
-                                    {% if experiencia.imagenes %}
+                                    {% if experiencia.nombre in correcciones_manuales %}
+                                        {% set image_src = correcciones_manuales[experiencia.nombre] %}
+                                    
+                                    {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
                                         {% set image_src = experiencia.imagenes[0] %}
+                                    
                                     {% elif experiencia.imagen_url %}
                                         {% set image_src = experiencia.imagen_url %}
                                     {% endif %}
 
-                                    <img src="{{ image_src }}" alt="{{ experiencia.nombre }}">
-                                    </div>
+                                    <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" onerror="this.src='https://via.placeholder.com/400x300.png?text=Error+Foto'">
+
+                                </div>
                                 <div class="event-card-content">
                                     <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
                                     <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
                                     <p class="text-muted small">
-                                        {{ experiencia.descripcion | truncate(100) }}
+                                        {{ experiencia.descripcion | truncate(80) }}
                                     </p>
                                 </div>
                                 <div class="card-footer-custom">
@@ -169,22 +119,22 @@
                                 </div>
                             </div>
                         </div>
-                    
                     {% else %}
                         <div class="col-12 text-center w-100">
                             <p class="fs-5 text-muted">Aún no hay experiencias registradas.</p>
                         </div>
                     {% endfor %}
                     
-                </div> </div> </div> 
+                </div> 
+            </div> 
+            
+        </div> 
     </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // --- SCRIPT DEL SLIDER DEL HERO ---
         const heroImages = [
             "{{ url_for('static', filename='images/Mariposa.jpg') }}",
             "{{ url_for('static', filename='images/Apicultores.jpg') }}",
@@ -199,7 +149,6 @@
         function changeHeroBackground() {
             imageIndex = (imageIndex + 1) % heroImages.length;
             const nextSlide = (currentSlide + 1) % slides.length;
-
             slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
             slides[nextSlide].classList.add('active');
             slides[currentSlide].classList.remove('active');
