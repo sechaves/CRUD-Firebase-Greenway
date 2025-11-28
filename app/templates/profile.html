@@ -1,138 +1,141 @@
-<!-- 1. Hereda de la plantilla principal (con navbar y footer) -->
 {% extends "base.html" %}
 
-<!-- 2. Define el título de la página -->
 {% block title %}Mi Perfil{% endblock %}
 
-<!-- 3. Define los estilos CSS específicos para esta página -->
-{% block styles %}
-<style>
-    .card-header { 
-        background-color: var(--greenway-primary); 
-        color: white; 
-        font-weight: 700; 
-    }
-    
-    .danger-zone { 
-        border: 1px solid #dc3545; 
-        border-radius: 8px; 
-    }
-</style>
-{% endblock %}
-
-
-<!-- 4. Define el contenido principal de la página -->
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-8 col-lg-6">
             
-            <h1 class="mb-4">Configuración de la Cuenta</h1>
-
-            <!-- ============================================= -->
-            <!-- Tarjeta de Información del Perfil -->
-            <!-- ============================================= -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    Mi Perfil
-                </div>
-                <div class="card-body">
-                    {% if user %}
-                        <p><strong>Nombre:</strong> {{ user.nombre }}</p>
-                        <p><strong>Email:</strong> {{ user.email }}</p>
-                        <p><strong>Teléfono:</strong> {{ user.telefono }}</p>
-
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5 text-center">
+                    
+                    <div class="mb-4 position-relative d-inline-block">
+                        {% if user.foto_url %}
+                            <img src="{{ user.foto_url }}" 
+                                 alt="Foto de perfil" 
+                                 class="rounded-circle img-thumbnail shadow-sm"
+                                 style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.nombre }}&background=var(--greenway-primary)&color=fff&size=150" 
+                                 alt="Avatar por defecto" 
+                                 class="rounded-circle img-thumbnail shadow-sm">
+                        {% endif %}
                         
-                        <!-- BOTÓN PARA ABRIR EL MODAL DE EDICIÓN -->
-                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <button class="btn btn-light btn-sm position-absolute bottom-0 end-0 rounded-circle shadow-sm p-2" 
+                                data-bs-toggle="modal" data-bs-target="#editProfileModal"
+                                style="border: 1px solid #dee2e6;">
+                            <i class="bi bi-pencil-fill text-primary"></i>
+                        </button>
+                    </div>
+
+                    <h2 class="fw-bold mb-1">{{ user.nombre }}</h2>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-envelope"></i> {{ user.email }}
+                    </p>
+                    
+                    <p class="text-muted mb-4">
+                        <i class="bi bi-telephone"></i> {{ user.telefono if user.telefono else 'Sin teléfono registrado' }}
+                    </p>
+
+                    <div class="d-grid gap-2 col-8 mx-auto">
+                        <button class="btn btn-outline-primary fw-bold" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                             Editar Perfil
                         </button>
+                        
+                        {% if session['role'] == 'propietaria' %}
+                        <a href="{{ url_for('crear_experiencia_form') }}" class="btn btn-primary text-white fw-bold">
+                            <i class="bi bi-plus-circle"></i> Publicar Experiencia
+                        </a>
+                        {% endif %}
+                    </div>
 
-                    {% else %}
-                        <p>Error al cargar los datos del usuario.</p>
-                    {% endif %}
+                    <hr class="my-4">
+
+                    <div class="d-grid gap-2 col-8 mx-auto">
+                        <a href="{{ url_for('reset_password') }}" class="btn btn-link text-decoration-none text-muted">
+                            Cambiar Contraseña
+                        </a>
+                        <button class="btn btn-link text-decoration-none text-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            Eliminar Cuenta
+                        </button>
+                    </div>
+
                 </div>
-            </div>
-
-            <!-- ============================================= -->
-            <!-- Tarjeta de Zona de Peligro -->
-            <!-- ============================================= -->
-            <div class="p-4 danger-zone">
-                <h5 class="text-danger">Zona de Peligro</h5>
-                <p class="text-muted">Una vez que eliminas tu cuenta, no hay vuelta atrás. Por favor, asegúrate.</p>
-                
-                <!-- BOTÓN PARA ABRIR EL MODAL DE ELIMINACIÓN -->
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                    Eliminar mi cuenta
-                </button>
             </div>
 
         </div>
     </div>
 </div>
 
-
-<!-- =================================================================== -->
-<!-- MODAL 1: Editar Perfil (Pop-up) -->
-<!-- =================================================================== -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editProfileModalLabel">Editar Perfil</h5>
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0 ps-4 pt-4">
+                <h5 class="modal-title fw-bold">Editar Perfil</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <!-- Formulario que envía los datos a la nueva ruta /update-profile -->
             <form action="{{ url_for('update_profile') }}" method="POST">
-                <div class="modal-body">
+                <div class="modal-body p-4">
+                    
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre Completo</label>
-                        <!-- 'value={{ user.nombre }}' precarga el nombre actual -->
-                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ user.nombre }}" required>
+                        <label for="nombre" class="form-label fw-bold small text-muted">NOMBRE COMPLETO</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control bg-light border-start-0" id="nombre" name="nombre" 
+                                   value="{{ user.nombre }}" required>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <!-- El email no se puede cambiar -->
-                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" disabled>
-                        <div class="form-text">El correo electrónico no se puede modificar.</div>
+                        <label for="telefono" class="form-label fw-bold small text-muted">TELÉFONO / WHATSAPP</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone"></i></span>
+                            <input type="tel" class="form-control bg-light border-start-0" id="telefono" name="telefono" 
+                                   value="{{ user.telefono if user.telefono else '' }}" placeholder="Ej: 3001234567">
+                        </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="foto_url" class="form-label fw-bold small text-muted">FOTO DE PERFIL (LINK/URL)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-camera"></i></span>
+                            <input type="url" class="form-control bg-light border-start-0" id="foto_url" name="foto_url" 
+                                   value="{{ user.foto_url if user.foto_url else '' }}" 
+                                   placeholder="https://i.postimg.cc/...">
+                        </div>
+                        <div class="form-text small mt-2">
+                            Sube tu foto a <a href="https://postimages.org/" target="_blank" class="text-decoration-none">Postimages</a> y pega aquí el "Enlace directo".
+                        </div>
+                    </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: var(--greenway-accent); border: none;">Guardar Cambios</button>
+                <div class="modal-footer border-0 pe-4 pb-4">
+                    <button type="button" class="btn btn-light text-muted fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary text-white fw-bold px-4">Guardar Cambios</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
-
-<!-- =================================================================== -->
-<!-- MODAL 2: Confirmar Eliminación (Pop-up) -->
-<!-- =================================================================== -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #dc3545; color: white;">
-                <h5 class="modal-title" id="deleteAccountModalLabel">¿Estás absolutamente seguro?</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0 ps-4 pt-4">
+                <h5 class="modal-title fw-bold text-danger">¿Eliminar Cuenta?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
-            <!-- Formulario que envía la orden a la nueva ruta /delete-account -->
-            <form action="{{ url_for('delete_account') }}" method="POST">
-                <div class="modal-body">
-                    <p>Esta acción es **irreversible**.</p>
-                    <p>Se eliminará tu cuenta de <strong>Firebase Authentication</strong> y todos tus datos (perfil, reservas, etc.) de la <strong>Realtime Database</strong>.</p>
-                    <p>Nadie podrá recuperar esta información. ¿Deseas continuar?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar, me arrepentí</button>
-                    <button type="submit" class="btn btn-danger">Sí, entiendo, eliminar mi cuenta</button>
-                </div>
-            </form>
-
+            <div class="modal-body p-4">
+                <p class="mb-0 text-muted">Esta acción es permanente y no se puede deshacer. Perderás acceso a tus reservas y datos.</p>
+            </div>
+            <div class="modal-footer border-0 pe-4 pb-4">
+                <button type="button" class="btn btn-light text-muted fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{{ url_for('delete_account') }}" method="POST">
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Sí, eliminar</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

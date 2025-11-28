@@ -234,13 +234,28 @@ def update_profile():
     try:
         user_id = session['user_id']
         user_rol = session['role']
-        nuevo_nombre = request.form['nombre']
-        if not nuevo_nombre or len(nuevo_nombre.strip()) == 0:
+        
+        # 1. Obtener datos del formulario
+        nuevo_nombre = request.form.get('nombre', '').strip()
+        nuevo_telefono = request.form.get('telefono', '').strip()
+        nueva_foto_url = request.form.get('foto_url', '').strip()
+
+        if not nuevo_nombre:
             flash('El nombre no puede estar vacío.', 'danger')
             return redirect(url_for('profile'))
+        
+        # 2. Preparar el objeto para actualizar en Firebase
+        update_data = {
+            "nombre": nuevo_nombre,
+            "telefono": nuevo_telefono,
+            "foto_url": nueva_foto_url
+        }
+
+        # 3. Guardar en el nodo correspondiente (usuarios o propietarios)
         nodo_db = Persona.get_db_node_by_role(user_rol)
-        db.child(nodo_db).child(user_id).update({"nombre": nuevo_nombre.strip()})
-        flash('Tu nombre ha sido actualizado con éxito.', 'success')
+        db.child(nodo_db).child(user_id).update(update_data)
+        
+        flash('Tu perfil ha sido actualizado con éxito.', 'success')
     except Exception as e:
         flash(f'Error al actualizar el perfil: {e}', 'danger')
     return redirect(url_for('profile'))
