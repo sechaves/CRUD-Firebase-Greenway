@@ -61,9 +61,15 @@
 
 <div class="hero-section">
     <div id="hero-background-slider">
-        <div class="hero-slide"></div>
-        <div class="hero-slide"></div>
+        <!-- Usamos IMG dentro de cada slide (más fiable que background-image) -->
+        <div class="hero-slide">
+            <img class="hero-bg-img" alt="hero-0" />
+        </div>
+        <div class="hero-slide">
+            <img class="hero-bg-img" alt="hero-1" />
+        </div>
     </div>
+
     <div class="hero-content">
         {% if session['user_email'] %}
             <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
@@ -137,6 +143,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
+    // Lista de imágenes reales (asegúrate que nombres coincidan EXACTAMENTE)
     const heroImages = [
         "{{ url_for('static', filename='images/Mariposa.jpg') }}",
         "{{ url_for('static', filename='images/Paisaje.jpg') }}",
@@ -145,25 +152,79 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     const slides = document.querySelectorAll('.hero-slide');
-    let currentSlide = 0;
-    let imageIndex = 0;
+    const slideImgs = document.querySelectorAll('.hero-bg-img');
 
-    function changeHeroBackground() {
-        imageIndex = (imageIndex + 1) % heroImages.length;
-        const nextSlide = (currentSlide + 1) % slides.length;
+    // fallback por si algo falla
+    const placeholder = "{{ url_for('static', filename='images/Paisaje.jpg') }}"; // puedes cambiar por un placeholder fijo
 
-        slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
-        slides[nextSlide].classList.add('active');
-        slides[currentSlide].classList.remove('active');
-
-        currentSlide = nextSlide;
+    // Preload + comprobación de carga: retorna Promise que se resuelve si carga, rechaza si no
+    function preloadImage(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(src);
+            img.onerror = () => reject(src);
+            img.src = src;
+        });
     }
 
-    if (slides.length > 0) {
-        slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
-        slides[0].classList.add('active');
-        setInterval(changeHeroBackground, 6000);
+    // Intentar cargar las imágenes en orden y llenar las slides
+    // Si una falla, usamos fallback placeholder
+    async function initHero() {
+        // Rellenamos ambos slides con la primera y segunda imagen válidas
+        let validImages = [];
+        for (let i = 0; i < heroImages.length; i++) {
+            try {
+                await preloadImage(heroImages[i]);
+                validImages.push(heroImages[i]);
+            } catch (errSrc) {
+                console.warn("Hero image failed to load:", errSrc);
+            }
+            if (validImages.length >= slides.length) break;
+        }
+
+        // Si no encontramos suficientes imágenes válidas, ponemos placeholders
+        while (validImages.length < slides.length) validImages.push(placeholder);
+
+        // Asignar src a cada <img> en slides
+        for (let i = 0; i < slides.length; i++) {
+            const imgEl = slideImgs[i];
+            imgEl.src = validImages[i];
+            imgEl.style.width = "100%";
+            imgEl.style.height = "100%";
+            imgEl.style.objectFit = "cover";
+            imgEl.style.display = "block";
+        }
+
+        // Después de asignar, activamos el slider normal (fade)
+        setupSlider(validImages);
     }
+
+    function setupSlider(validImages) {
+        // animación simple vía clases de CSS (usa tus .hero-slide.active)
+        let currentSlide = 0;
+        // inicial
+        slides.forEach(s => s.classList.remove('active'));
+        slides[currentSlide].classList.add('active');
+
+        // change slide cada X segundos
+        setInterval(() => {
+            const next = (currentSlide + 1) % slides.length;
+            slides[next].classList.add('active');
+            slides[currentSlide].classList.remove('active');
+            currentSlide = next;
+        }, 6000);
+    }
+
+    // Llamada inicial
+    initHero().catch(err => {
+        console.error("Error inicializando hero:", err);
+        // Fallback forzado: asignar placeholders
+        const slideImgs = document.querySelectorAll('.hero-bg-img');
+        slideImgs.forEach(img => img.src = placeholder);
+        // activar slider básico
+        slides[0] && slides[0].classList.add('active');
+    });
+
 });
 </script>
 {% endblock %}
