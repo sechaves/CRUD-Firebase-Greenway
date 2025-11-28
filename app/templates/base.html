@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bienvenido{% endblock %} - GREENWAY</title>
     
-    <!-- Links CSS Comunes -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -15,200 +14,225 @@
         
         :root {
             --greenway-primary: #A6D204; /* Verde principal */
-            --greenway-accent: #00b7ff;   /* Naranja (para el chat) */
-            --greenway-yellow-light: #FBEE3F; /* Amarillo alerta */
-            --greenway-blue: #648BFF;       /* Azul info */
+            --greenway-accent: #00b7ff;   /* Azul/Celeste */
+            --greenway-yellow-light: #FBEE3F; 
+            --greenway-blue: #648BFF;       
             --greenway-text: #222;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #fafafa;
-            /* El padding-top se añade con JS para que sea dinámico */
+            /* El padding-top se añade con JS */
         }
 
         /* NAVBAR (Común) */
         .navbar-greenway {
             background-color: var(--greenway-primary) !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            padding: 10px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 12px 40px;
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1030;
             transition: transform 0.3s ease-in-out;
         }
-        .navbar-greenway .navbar-brand, .navbar-greenway .nav-link { color: white !important; font-weight: 600; transition: color 0.3s; }
-        .navbar-greenway .nav-link:hover { color: #222 !important; }
-        .navbar-greenway .btn-light { background-color: white !important; color: var(--greenway-primary) !important; font-weight: 700; border: none; transition: all 0.3s; }
-        .navbar-greenway .btn-light:hover { background-color: #f8f8f8 !important; transform: scale(1.05); }
+        .navbar-greenway .navbar-brand, .navbar-greenway .nav-link { color: white !important; font-weight: 700; transition: opacity 0.3s; }
+        .navbar-greenway .nav-link:hover { opacity: 0.8; }
+        .navbar-greenway .btn-light { background-color: white !important; color: var(--greenway-primary) !important; font-weight: 800; border-radius: 20px; padding: 6px 20px; transition: all 0.3s; }
+        .navbar-greenway .btn-light:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .navbar-hidden { transform: translateY(-100%); }
 
         /* FOOTER (Común) */
         .footer-greenway {
-            background-color: #222;
+            background-color: #1a1a1a;
             color: #ccc;
+            padding-top: 3rem;
         }
-        .footer-greenway h5 { font-weight: 700; color: var(--greenway-primary); font-size: 1.5rem; }
+        .footer-greenway h5 { font-weight: 800; color: var(--greenway-primary); font-size: 1.5rem; letter-spacing: 1px; }
         .footer-greenway p { font-size: 0.9rem; margin-bottom: 5px; }
         .footer-greenway strong { color: #fff; }
-        .footer-greenway .copyright { background-color: rgba(0, 0, 0, 0.2); font-size: 0.8rem; }
+        .footer-greenway .copyright { background-color: #111; font-size: 0.8rem; margin-top: 2rem; }
 
-        /* ANIMATIONS (Común) */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Colores de Alertas (Flash) Personalizados */
-        .alert-success { background-color: var(--greenway-primary); color: white; border: none; }
-        .alert-danger { background-color: #dc3545; color: white; border: none; }
-        .alert-info { background-color: var(--greenway-blue); color: white; border: none; }
-        .alert-warning { background-color: var(--greenway-yellow-light); color: var(--greenway-text); border: none; }
-
-        /* --- ESTILOS DEL CHATBOT --- */
+        /* --- ESTILOS DEL CHATBOT (REDISEÑADO) --- */
         #chat-toggle {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: var(--greenway-accent); /* Color del botón */
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, var(--greenway-primary), #8bc34a);
             color: white;
             border-radius: 50%;
             border: none;
-            font-size: 28px;
+            font-size: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(166, 210, 4, 0.4);
             z-index: 1040;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
         #chat-toggle:hover {
-            transform: scale(1.1);
-            background-color: #00a2ff; /* Un poco más oscuro al pasar el mouse */
+            transform: scale(1.1) rotate(10deg);
         }
+
         #chat-window {
             position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 350px;
-            height: 450px;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
             z-index: 1039;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* Oculto por defecto */
+            /* Animación de entrada */
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(20px) scale(0.95);
             visibility: hidden;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0,0,0,0.05);
         }
         #chat-window.open {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
             visibility: visible;
         }
+
         #chat-header {
-            background-color: var(--greenway-accent); /* Color del header */
+            /* CORREGIDO: Cambié #9yc33a por #8bc34a (verde válido) */
+            background: linear-gradient(135deg, var(--greenway-primary), #8bc34a);
             color: white;
-            padding: 15px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-align: center;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+        #chat-header h5 { margin: 0; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        #chat-close-btn { background: none; border: none; color: white; opacity: 0.8; font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;}
+        #chat-close-btn:hover { opacity: 1; }
+
         #chat-messages {
             flex-grow: 1;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
+            background-color: #f9f9f9;
         }
+
+        /* BURBUJAS DE MENSAJE */
         .chat-message {
-            padding: 10px 14px;
-            border-radius: 20px;
-            max-width: 80%;
-            line-height: 1.4;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            position: relative;
+            animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .user-message {
-            background-color: #f1f1f1;
-            color: #333;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-        .bot-message {
-            background-color: var(--greenway-accent);
+            background-color: var(--greenway-accent); /* Color Azul */
             color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px; /* Efecto burbuja */
+            box-shadow: 0 2px 5px rgba(0, 183, 255, 0.2);
+        }
+
+        .bot-message {
+            background-color: #ffffff;
+            color: #333;
             align-self: flex-start;
-            border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 4px; /* Efecto burbuja */
+            border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .bot-message.loading {
-            /* Animación de "escribiendo..." */
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
+        /* Animación de "escribiendo" */
+        .bot-message.loading {
+            color: #888;
+            font-style: italic;
+            background: #f0f0f0;
+        }
+
         #chat-form {
             display: flex;
-            border-top: 1px solid #eee;
-            padding: 10px;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            gap: 10px;
         }
         #chat-input {
             flex-grow: 1;
-            border: none;
-            padding: 10px;
-            border-radius: 20px;
-            background-color: #f7f7f7;
+            border: 1px solid #eee;
+            padding: 12px 20px;
+            border-radius: 30px;
+            background-color: #f8f9fa;
+            transition: all 0.2s;
         }
         #chat-input:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--greenway-accent);
+            background-color: white;
+            border-color: var(--greenway-accent);
+            box-shadow: 0 0 0 3px rgba(0, 183, 255, 0.1);
         }
         #chat-submit {
-            background: none;
+            background: var(--greenway-accent);
             border: none;
-            color: var(--greenway-accent);
-            font-size: 20px;
-            padding: 0 10px;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 183, 255, 0.3);
         }
+        #chat-submit:hover { transform: scale(1.1); }
+
     </style>
 
-    <!-- Bloque para estilos específicos de cada página -->
     {% block styles %}{% endblock %}
 
 </head>
 <body>
 
-    <!-- ======== NAVBAR (EN BASE.HTML) ======== -->
     <nav class="navbar navbar-expand-lg navbar-greenway">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             
             <div style="width: 100px;"></div> 
 
             <div class="d-flex mx-auto align-items-center"> 
-                <a class="navbar-brand me-4" href="{{ url_for('home') }}">
+                <a class="navbar-brand me-4" href="{{ url_for('home') }}" style="font-weight: 900; letter-spacing: 1px;">
                     GREENWAY 
                 </a>
                 <div class="collapse navbar-collapse show" id="navbarNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav gap-3">
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Inicio</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('experiencias') }}">Experiencias</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('chats') }}">Chats</a></li>
                         
-                        <!-- Lógica de Roles -->
                         {% if session.role == 'admin' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin_panel') }}">Panel de Admin</a>
+                                <a class="nav-link text-warning" href="{{ url_for('admin_panel') }}"><i class="bi bi-shield-lock"></i> Admin</a>
                             </li>
                         {% elif session.role == 'propietaria' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('crear_experiencia_form') }}">Registrar Experiencia</a>
+                                <a class="nav-link" href="{{ url_for('crear_experiencia_form') }}"><i class="bi bi-plus-circle"></i> Publicar</a>
                             </li>
                         {% endif %}
-                        <!-- Fin de la lógica de roles -->
-
                     </ul>
                 </div>
             </div>
@@ -216,31 +240,28 @@
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="btn btn-sm btn-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <!-- Muestra el email si está en la sesión -->
                         {% if session.user_email %}
-                            {{ session.user_email.split('@')[0] }}
+                            <i class="bi bi-person-circle me-1"></i> {{ session.user_email.split('@')[0] }}
                         {% else %}
                             Cuenta
                         {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ url_for('profile') }}">Mi Perfil</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('settings') }}">Configuración</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                        <li><a class="dropdown-item py-2" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i> Mi Perfil</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                        <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <!-- ======== CONTENEDOR DE NOTIFICACIONES (FLASH) ======== -->
     <div class="container" style="position: relative; z-index: 1025; margin-top: 1rem;">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             <div class="mt-2">
               {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
                   {{ message }}
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -250,49 +271,50 @@
         {% endwith %}
     </div>
 
-    <!-- ======== CONTENIDO PRINCIPAL (HEREDABLE) ======== -->
-    <main>
+    <main style="min-height: 80vh;">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ======== FOOTER (EN BASE.HTML) ======== -->
     <footer class="text-center footer-greenway mt-5">
         <div class="container p-4">
             <section class="mb-4">
                 <h5>GREENWAY</h5>
-                <p>Proyecto Final de Programación Orientada a Objetos</p>
+                <p>Tu conexión directa con el Santuario.</p>
             </section>
-            <hr>
+            <hr style="border-color: #444;">
             <section class="mt-4">
-                <div class="row justify-content-center">
+                <div class="row justify-content-center text-secondary">
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Sergio Gabriel Chaves Mosquera</strong><br>
-                        @sergio.gcm
+                        <strong class="text-white">Sergio Chaves</strong>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Maria Jose Sanchez Portillo</strong><br>
-                        @sanjo0702
+                        <strong class="text-white">Maria Jose Sanchez</strong>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Samuel Esteban Reyes Uribe</strong><br>
-                        @kpixa_1036
+                        <strong class="text-white">Samuel Reyes</strong>
                     </div>
                 </div>
             </section>
         </div>
         <div class="text-center p-3 copyright">
-            © 2025 Copyright: The Greenway Team
+            © 2025 Greenway Project
         </div>
     </footer>
 
-    <!-- ======== CHATBOT HTML (EN BASE.HTML) ======== -->
     <div id="chat-window">
-        <div id="chat-header">Chat Greenway 🐝</div>
+        <div id="chat-header">
+            <div>
+                <h5><i class="bi bi-robot me-2"></i> Asistente IA</h5>
+            </div>
+            <button id="chat-close-btn"><i class="bi bi-chevron-down"></i></button>
+        </div>
+        
         <div id="chat-messages">
-            <div class="bot-message">
-                ¡Hola! Soy Greenway-bot. ¿En qué puedo ayudarte hoy?
+            <div class="bot-message chat-message">
+                👋 ¡Hola! Soy el asistente virtual de Greenway. <br>¿En qué te puedo ayudar hoy?
             </div>
         </div>
+        
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off">
             <button type="submit" id="chat-submit">
@@ -300,25 +322,21 @@
             </button>
         </form>
     </div>
+
     <button id="chat-toggle">
         <i class="bi bi-chat-dots-fill"></i>
     </button>
 
 
-    <!-- ======== SCRIPTS COMUNES (EN BASE.HTML) ======== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- SCRIPT PARA LA SMART NAVBAR (Común) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let prevScrollPos = window.pageYOffset;
             const navbar = document.querySelector('.navbar-greenway');
-            
-            // Ajuste dinámico del padding-top del body
             if (navbar) {
                 document.body.style.paddingTop = navbar.offsetHeight + 'px';
             }
-            
             window.onscroll = function() {
                 if (!navbar) return;
                 const currentScrollPos = window.pageYOffset;
@@ -334,110 +352,89 @@
         });
     </script>
 
-    <!-- SCRIPT DEL CHATBOT (EN BASE.HTML) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatWindow = document.getElementById('chat-window');
             const chatToggle = document.getElementById('chat-toggle');
+            const chatCloseBtn = document.getElementById('chat-close-btn');
             const chatForm = document.getElementById('chat-form');
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
 
-            // 1. Abrir/Cerrar el chat
-            if (chatToggle) { // Asegurarse de que el elemento exista
-                chatToggle.addEventListener('click', () => {
-                    chatWindow.classList.toggle('open');
-                    // Cambiar el ícono
-                    const icon = chatToggle.querySelector('i');
-                    if (chatWindow.classList.contains('open')) {
-                        icon.classList.remove('bi-chat-dots-fill');
-                        icon.classList.add('bi-x-lg');
-                    } else {
-                        icon.classList.remove('bi-x-lg');
-                        icon.classList.add('bi-chat-dots-fill');
-                    }
-                });
+            // Abrir/Cerrar
+            function toggleChat() {
+                chatWindow.classList.toggle('open');
+                const icon = chatToggle.querySelector('i');
+                if (chatWindow.classList.contains('open')) {
+                    icon.classList.remove('bi-chat-dots-fill');
+                    icon.classList.add('bi-x-lg');
+                } else {
+                    icon.classList.remove('bi-x-lg');
+                    icon.classList.add('bi-chat-dots-fill');
+                }
             }
 
-            // 2. Enviar el formulario
-            if (chatForm) { // Asegurarse de que el elemento exista
+            if (chatToggle) chatToggle.addEventListener('click', toggleChat);
+            if (chatCloseBtn) chatCloseBtn.addEventListener('click', toggleChat);
+
+            // Enviar mensaje
+            if (chatForm) {
                 chatForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const userMessage = chatInput.value.trim();
                     if (userMessage === '') return;
 
-                    // Añadir mensaje del usuario al chat
                     addMessage(userMessage, 'user');
                     chatInput.value = '';
 
-                    // Mostrar "escribiendo..."
-                    addMessage('...', 'bot', true);
+                    // Loader
+                    const loader = document.createElement('div');
+                    loader.classList.add('bot-message', 'chat-message', 'loading');
+                    loader.innerHTML = '<i class="bi bi-three-dots"></i> Escribiendo...';
+                    chatMessages.appendChild(loader);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                     
-                    // Enviar al backend (main.py)
                     fetch('/ask-chatbot', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ pregunta: userMessage })
                     })
                     .then(response => response.json())
                     .then(data => {
-                        // Quitar el "escribiendo..."
-                        removeLoadingMessage();
-                        
+                        loader.remove();
                         if (data.respuesta) {
                             addMessage(data.respuesta, 'bot');
                         } else {
-                            addMessage('Lo siento, hubo un error. Intenta de nuevo.', 'bot');
+                            addMessage('Lo siento, no pude procesar eso.', 'bot');
                         }
                     })
                     .catch(error => {
-                        console.error('Error en el chat:', error);
-                        removeLoadingMessage();
-                        addMessage('Error de conexión con el bot. 🤖', 'bot');
+                        loader.remove();
+                        addMessage('Error de conexión ⚠️', 'bot');
                     });
                 });
             }
 
-            // --- Funciones auxiliares del chat ---
-
-            function addMessage(text, sender, isLoading = false) {
+            function addMessage(text, sender) {
                 const messageEl = document.createElement('div');
                 messageEl.classList.add('chat-message');
                 messageEl.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-                if (isLoading) {
-                    messageEl.classList.add('loading');
-                }
-                messageEl.textContent = text;
+                messageEl.textContent = text; // Usamos textContent para evitar inyección HTML
                 chatMessages.appendChild(messageEl);
-                
-                // Auto-scroll al fondo
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-
-            function removeLoadingMessage() {
-                const loadingEl = chatMessages.querySelector('.bot-message.loading');
-                if (loadingEl) {
-                    loadingEl.remove();
-                }
-            }
-
         });
     </script>
 
-    <!-- Bloque para scripts específicos de cada página -->
-    {% block scripts %}{% endblock %}
     <script>
-    // Cerrar alertas automáticamente después de 4 segundos
     setTimeout(function() {
         var alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
             var bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         });
-    }, 4000); // 4000 milisegundos = 4 segundos
-</script>
+    }, 4000);
+    </script>
 
 </body>
 </html>
