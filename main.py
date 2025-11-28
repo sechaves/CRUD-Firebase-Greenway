@@ -274,14 +274,30 @@ def chats():
     
     user_id = session.get('user_id')
     room_id = None
+    target_name = owner_id # Por defecto usamos el ID si no encontramos nombre
 
     if owner_id and exp_id and user_id:
         room_id = build_room_id(user_id, owner_id, exp_id)
+        
+        # --- BUSCAR EL NOMBRE REAL (Lógica Nueva) ---
+        try:
+            # 1. Buscamos en propietarios
+            persona = db.child("propietarios").child(owner_id).get().val()
+            if not persona:
+                # 2. Si no es propietario, buscamos en usuarios
+                persona = db.child("usuarios").child(owner_id).get().val()
+            
+            if persona and 'nombre' in persona:
+                target_name = persona['nombre']
+        except:
+            pass # Si falla, se queda con el ID
+        # --------------------------------------------
 
     return render_template('chats.html',
                            session=session,
                            room_id=room_id,
-                           owner_id=owner_id,
+                           owner_id=owner_id,     # ID para lógica
+                           owner_name=target_name, # NOMBRE para mostrar
                            exp_id=exp_id)
 
 # --- Rutas CRUD / Admin ---

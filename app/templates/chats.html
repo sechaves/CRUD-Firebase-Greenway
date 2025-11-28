@@ -15,7 +15,6 @@
   .composer input:focus { outline:none; border-color:var(--greenway-accent); box-shadow:0 0 0 2px rgba(0,183,255,0.3); }
   .composer button { background:var(--greenway-accent); color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:600; cursor:pointer;}
   
-  /* Estilo para los items de la lista */
   .chat-item {
       display: flex; align-items: center; gap: 10px;
       padding: 10px; border-radius: 8px; cursor: pointer;
@@ -32,7 +31,6 @@
 
     <div class="left-list">
       <h5 class="mb-3" style="font-weight:700;">Tus Conversaciones</h5>
-      
       <div id="chat-list-container">
           <p class="text-center text-muted mt-4"><small>Cargando chats...</small></p>
       </div>
@@ -40,8 +38,8 @@
 
     <div class="chat-panel">
       <div style="padding:16px 20px; border-bottom:1px solid #e0e0e0; font-weight:700;">
-        {% if owner_id %} 
-            Chat con: <span class="text-primary">{{ owner_id }}</span>
+        {% if owner_name %} 
+            Chat con: <span class="text-primary">{{ owner_name }}</span>
         {% else %} 
             Selecciona un chat 
         {% endif %}
@@ -71,7 +69,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  // 1. Configuración (PÚBLICA Y SEGURA)
   const firebaseConfig = {
     apiKey: "AIzaSyCvNgRDVftYYYOO4NntYy6yjo9hUOrH_CU",
     authDomain: "greenway-450aa.firebaseapp.com",
@@ -87,25 +84,37 @@
   }
   const db = firebase.database();
 
-  // Variables de sesión
   const ROOM_ID = "{{ room_id }}"; 
   const MY_USER_ID = "{{ session.user_id }}";
   const MY_NAME = "{{ session.user_email.split('@')[0] if session.user_email else 'Usuario' }}";
 
-  // Elementos DOM
   const messagesDiv = document.getElementById('messages');
   const msgInput = document.getElementById('msgInput');
   const sendBtn = document.getElementById('sendBtn');
   const chatListContainer = document.getElementById('chat-list-container');
 
-  // ==========================================
-  // PARTE 1: LISTAR LOS CHATS A LA IZQUIERDA
-  // ==========================================
-  
-  // Escuchamos TODO el nodo 'chats' (en una app real gigante esto se optimiza, 
-  // pero para tu proyecto está perfecto y funciona rápido).
+  // --- FUNCIÓN PARA OBTENER EL NOMBRE REAL ---
+  async function getUserName(userId, elementId) {
+      // Intentar buscar en propietarios
+      db.ref('propietarios/' + userId).once('value').then(snap => {
+          if (snap.exists()) {
+              document.getElementById(elementId).innerText = snap.val().nombre;
+          } else {
+              // Si no, buscar en usuarios
+              db.ref('usuarios/' + userId).once('value').then(snap2 => {
+                  if (snap2.exists()) {
+                      document.getElementById(elementId).innerText = snap2.val().nombre;
+                  } else {
+                      document.getElementById(elementId).innerText = "Usuario";
+                  }
+              });
+          }
+      });
+  }
+
+  // --- LISTAR CHATS ---
   db.ref('chats').on('value', (snapshot) => {
-      chatListContainer.innerHTML = ""; // Limpiar lista
+      chatListContainer.innerHTML = ""; 
       const allChats = snapshot.val();
 
       if (!allChats) {
@@ -115,47 +124,42 @@
 
       let foundAny = false;
 
-      // Recorremos todos los chats que existen en la base de datos
-      // Las llaves son tipo: "chat_EXPID_USERA_USERB"
       Object.keys(allChats).forEach(key => {
-          
-          // Verificamos si YO soy parte de ese chat (si mi ID está en el nombre de la sala)
           if (key.includes(MY_USER_ID)) {
               foundAny = true;
               
-              // Desglosamos el nombre para sacar info: chat_EXPID_USERA_USERB
               const parts = key.split('_');
-              // parts[0] = "chat"
-              // parts[1] = EXP_ID
-              // parts[2] = ID_UNO
-              // parts[3] = ID_DOS
-
               const expId = parts[1];
               const userA = parts[2];
               const userB = parts[3];
 
-              // Identificar quién es "el otro"
               let otherUserId = (userA === MY_USER_ID) ? userB : userA;
+              
+              // Generamos un ID único para el <span> del nombre
+              const nameSpanId = `name-${key}`; 
 
-              // Crear el elemento HTML del botón
               const div = document.createElement('div');
               const isActive = (key === ROOM_ID) ? 'active' : '';
               div.className = `chat-item ${isActive}`;
               div.innerHTML = `
                   <img src="https://ui-avatars.com/api/?name=${otherUserId}&background=random" 
                        style="width:40px;height:40px;border-radius:50%;">
-                  <div style="overflow:hidden;">
-                      <div style="font-weight:bold;font-size:0.9rem;">Usuario: ${otherUserId.substring(0,10)}...</div>
+                  <div style="overflow:hidden; flex:1;">
+                      <div style="font-weight:bold;font-size:0.9rem;">
+                        <span id="${nameSpanId}">Cargando...</span>
+                      </div>
                       <small class="text-muted" style="font-size:0.75rem;">Exp: ${expId}</small>
                   </div>
               `;
 
-              // Al hacer clic, recargamos la página con los parámetros correctos
               div.onclick = () => {
                   window.location.href = `/chats?owner_id=${otherUserId}&exp_id=${expId}`;
               };
 
               chatListContainer.appendChild(div);
+              
+              // ¡Llamamos a la función mágica para buscar el nombre!
+              getUserName(otherUserId, nameSpanId);
           }
       });
 
@@ -164,11 +168,7 @@
       }
   });
 
-
-  // ==========================================
-  // PARTE 2: EL CHAT ACTIVO (DERECHA)
-  // ==========================================
-
+  // --- LOGICA DE MENSAJES (IGUAL QUE ANTES) ---
   function sendMessage() {
     const text = msgInput.value.trim();
     if (!text) return;
@@ -188,7 +188,6 @@
     const isMe = (msg.sender_id === MY_USER_ID);
     div.className = 'msg ' + (isMe ? 'me' : 'other');
     
-    // Convertir timestamp a hora legible
     const date = new Date(msg.timestamp);
     const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -204,10 +203,7 @@
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  // Si hay un chat seleccionado, cargamos los mensajes
   if (ROOM_ID && ROOM_ID !== "None") {
-    console.log("Conectando al chat:", ROOM_ID);
-    
     db.ref('chats/' + ROOM_ID + '/messages').orderByChild('timestamp').on('child_added', (snapshot) => {
       const data = snapshot.val();
       renderMessage(data);
@@ -218,6 +214,5 @@
       if (e.key === 'Enter') sendMessage();
     });
   }
-
 </script>
 {% endblock %}
