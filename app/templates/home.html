@@ -26,8 +26,8 @@
     .events-section { padding: 60px 0; position: relative; overflow: hidden; }
     .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; }
     .section-subtitle { font-size: 1.1rem; color: #555; margin-bottom: 50px; }
-    
-    /* --- Estilos Tarjetas --- */
+
+    /* --- Tarjetas --- */
     .event-card {
         background-color: #fff; border-radius: 20px; overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: all 0.3s ease-in-out;
@@ -42,7 +42,7 @@
     .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 15px 20px 20px 20px; }
     .btn-greenway-details { background-color: var(--greenway-primary); color: white; font-weight: 600; transition: all 0.3s ease; }
     .btn-greenway-details:hover { background-color: #8db303; color: white; }
-    
+
     /* --- Carrusel --- */
     .carousel-container { overflow-x: auto; padding-bottom: 30px; padding-left: 10px; scrollbar-width: thin; }
     .carousel-track { display: flex; gap: 25px; width: max-content; }
@@ -52,117 +52,118 @@
 
 {% block content %}
 
-    {% set correcciones_manuales = {
-        'LaMesa': 'https://cloudfront-us-east-1.images.arcpublishing.com/infobae/E7RJPE5B7RFFZMAKBKC24NQJS4.jpg', 
-        'Medellin': 'https://happygringo.com/wp-content/uploads/2021/08/medellin.jpg',
-        'Cocora': 'https://i0.wp.com/passporterapp.com/es/blog/wp-content/uploads/2024/05/planificar-viaje-al-Valle-del-Cocora.jpeg?resize=1140%2C760&ssl=1',
-        'Chicamocha': 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Ca%C3%B1on_del_Chicamocha.jpeg',
-        'Quindio': 'https://q-xx.bstatic.com/xdata/images/hotel/840x460/600082455.jpg?k=9c1adbeea6c7c369ba5ed7fc8bda4f4a93598125e423f5da4a397c0f402c7652&o=',
-        'CocoraPro': 'https://www.wendywutours.com.au/resource/upload/2125/cocora-valley-banner.jpg.webp'
-    } %}
-    <div class="hero-section">
-        <div id="hero-background-slider">
-            <div class="hero-slide"></div>
-            <div class="hero-slide"></div>
-        </div>
-        <div class="hero-content">
-            {% if session['user_email'] %}
-                <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
-            {% endif %}
-            <h1 class="hero-title">Descubre las mejores ofertas para ti</h1>
-            <p class="hero-sub">Basadas en tu actividad reciente en Greenway</p>
-        </div>
+{% set correcciones_manuales = {
+    'LaMesa': url_for('static', filename='images/LaMesaCundinamarca.jpg'),
+    'Medellin': url_for('static', filename='images/Medellin.jpg'),
+    'Cocora': url_for('static', filename='images/Paisaje.jpg'),
+    'Chicamocha': url_for('static', filename='images/Cañono_del_Chicamocha.jpeg')
+} %}
+
+<div class="hero-section">
+    <div id="hero-background-slider">
+        <div class="hero-slide"></div>
+        <div class="hero-slide"></div>
     </div>
+    <div class="hero-content">
+        {% if session['user_email'] %}
+            <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
+        {% endif %}
+        <h1 class="hero-title">Descubre las mejores ofertas para ti</h1>
+        <p class="hero-sub">Basadas en tu actividad reciente en Greenway</p>
+    </div>
+</div>
 
-    <section class="events-section">
-        <div class="container"> 
-            
-            <div class="row text-center">
-                <div class="col-12">
-                    <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
-                    <p class="section-subtitle">Descubre las experiencias únicas registradas por nuestr@s propietari@s.</p>
-                </div>
+<section class="events-section">
+    <div class="container">
+
+        <div class="row text-center">
+            <div class="col-12">
+                <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
+                <p class="section-subtitle">Descubre experiencias únicas</p>
             </div>
+        </div>
 
-            <div class="carousel-container">
-                <div class="carousel-track">
-                    
-                    {% for experiencia in experiencias %}
-                        <div class="carousel-card"> 
-                            <div class="event-card w-100"> 
-                                <div class="event-card-image">
-                                    
-                                    {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
+        <div class="carousel-container">
+            <div class="carousel-track">
 
-                                    {% if experiencia.nombre in correcciones_manuales %}
-                                        {% set image_src = correcciones_manuales[experiencia.nombre] %}
+                {% for experiencia in experiencias %}
+                    <div class="carousel-card">
+                        <div class="event-card w-100">
+                            <div class="event-card-image">
 
-                                    {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
-                                        {% set image_src = url_for('static', filename='images/' ~ experiencia.imagenes[0]) %}
+                                {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
 
-                                    {% elif experiencia.imagen_url %}
-                                        {% set image_src = experiencia.imagen_url %}
-                                    {% endif %}
+                                {% if experiencia.nombre in correcciones_manuales %}
+                                    {% set image_src = correcciones_manuales[experiencia.nombre] %}
 
+                                {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
+                                    {% set image_src = experiencia.imagenes[0] %}
 
-                                    <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" onerror="this.src='https://via.placeholder.com/400x300.png?text=Error+Foto'">
+                                {% elif experiencia.imagen_url %}
+                                    {% set image_src = experiencia.imagen_url %}
+                                {% endif %}
 
-                                </div>
-                                <div class="event-card-content">
-                                    <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
-                                    <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
-                                    <p class="text-muted small">
-                                        {{ experiencia.descripcion | truncate(80) }}
-                                    </p>
-                                </div>
-                                <div class="card-footer-custom">
-                                    <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
-                                        Ver Detalles
-                                    </a>
-                                </div>
+                                <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" onerror="this.src='https://via.placeholder.com/400x300.png?text=Error+Foto'">
+
+                            </div>
+
+                            <div class="event-card-content">
+                                <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
+                                <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
+                                <p class="text-muted small">{{ experiencia.descripcion | truncate(80) }}</p>
+                            </div>
+
+                            <div class="card-footer-custom">
+                                <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
+                                    Ver Detalles
+                                </a>
                             </div>
                         </div>
-                    {% else %}
-                        <div class="col-12 text-center w-100">
-                            <p class="fs-5 text-muted">Aún no hay experiencias registradas.</p>
-                        </div>
-                    {% endfor %}
-                    
-                </div> 
-            </div> 
-            
-        </div> 
-    </section>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center w-100">
+                        <p class="fs-5 text-muted">Aún no hay experiencias registradas.</p>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const heroImages = [
-            "{{ url_for('static', filename='images/Mariposa.jpg') }}",
-            "{{ url_for('static', filename='images/Apicultores.jpg') }}",
-            "{{ url_for('static', filename='images/Apiario.jpg') }}",
-            "{{ url_for('static', filename='images/Portada-Mariposario.png') }}"
-        ];
+document.addEventListener('DOMContentLoaded', function() {
 
-        const slides = document.querySelectorAll('.hero-slide');
-        let currentSlide = 0;
-        let imageIndex = 0;
+    const heroImages = [
+        "{{ url_for('static', filename='images/Mariposa.jpg') }}",
+        "{{ url_for('static', filename='images/Paisaje.jpg') }}",
+        "{{ url_for('static', filename='images/LaMesaCundinamarca.jpg') }}",
+        "{{ url_for('static', filename='images/Medellin.jpg') }}"
+    ];
 
-        function changeHeroBackground() {
-            imageIndex = (imageIndex + 1) % heroImages.length;
-            const nextSlide = (currentSlide + 1) % slides.length;
-            slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
-            slides[nextSlide].classList.add('active');
-            slides[currentSlide].classList.remove('active');
-            currentSlide = nextSlide;
-        }
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
+    let imageIndex = 0;
 
-        if (slides.length > 0) {
-            slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
-            slides[0].classList.add('active');
-            setInterval(changeHeroBackground, 6000);
-        }
-    }); 
+    function changeHeroBackground() {
+        imageIndex = (imageIndex + 1) % heroImages.length;
+        const nextSlide = (currentSlide + 1) % slides.length;
+
+        slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
+        slides[nextSlide].classList.add('active');
+        slides[currentSlide].classList.remove('active');
+
+        currentSlide = nextSlide;
+    }
+
+    if (slides.length > 0) {
+        slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
+        slides[0].classList.add('active');
+        setInterval(changeHeroBackground, 6000);
+    }
+});
 </script>
 {% endblock %}
