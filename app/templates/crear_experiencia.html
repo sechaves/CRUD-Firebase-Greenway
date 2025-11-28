@@ -47,16 +47,26 @@
                                    placeholder="Ej: 150000" required>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="maps_embed_url" class="form-label">Ubicación (Google Maps)</label>
+                            <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
+                                      placeholder='Ve a Google Maps -> Compartir -> Insertar un mapa -> Copiar HTML'></textarea>
+                            <div class="form-text">
+                                Pega aquí el código que empieza con <code>&lt;iframe...</code>
+                            </div>
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary w-100" style="background-color: var(--greenway-primary); border: none; font-weight: 600;">
                             Registrar Experiencia
                         </button>
 
-                    </div> </div> </form> 
+                    </div> 
+                </div> 
+            </form> 
         </div> 
     </div> 
 </div> 
 {% endblock %}
-
 
 {% block scripts %}
 <script>

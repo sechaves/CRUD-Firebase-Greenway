@@ -31,6 +31,12 @@
         color: white;
         transform: translateY(-2px);
     }
+    /* Estilo para el mapa responsive */
+    .map-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 15px;
+    }
 </style>
 {% endblock %}
 
@@ -84,8 +90,8 @@
 
             {% if experiencia.maps_embed_url %}
                 <hr class="my-4">
-                <h2 class="fw-bold">Ubicación</h2>
-                <div class="ratio ratio-16x9" style="border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <h2 class="fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> Ubicación</h2>
+                <div class="ratio ratio-16x9 map-container shadow-sm mb-4">
                     {{ experiencia.maps_embed_url|safe }}
                 </div>
             {% endif %}
@@ -121,7 +127,6 @@
                                 Inicia sesión para contactar
                             </a>
                         {% endif %}
-                        
                         
                         {% if session['role'] == 'admin' or (experiencia.propietario_id == session['user_id']) %}
                             <hr class="my-4">
