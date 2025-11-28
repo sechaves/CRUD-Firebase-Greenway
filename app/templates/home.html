@@ -1,460 +1,216 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bienvenido{% endblock %} - GREENWAY</title>
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block styles %}
+<style>
+    /* --- Estilos del Hero (sin cambios) --- */
+    .hero-section {
+        height: 80vh;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #333;
+    }
+    #hero-background-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .hero-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
+    .hero-slide.active { opacity: 1; }
+    .hero-content { position: relative; z-index: 2; color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; }
+    .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
+    .hero-sub { font-weight: 500; font-size: 1.1rem; }
+
+    /* --- ESTILOS DE SECCIÓN DE ALOJAMIENTOS --- */
+    .events-section {
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden; 
+    }
+    .section-title {
+        font-weight: 900;
+        font-size: 2.5rem;
+        color: var(--greenway-text);
+        margin-bottom: 10px;
+    }
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 50px;
+    }
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    /* --- Estilos para las tarjetas --- */
+    .event-card {
+        background-color: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease-in-out;
+        height: 100%; 
+        display: flex;
+        flex-direction: column;
+    }
+    .event-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .event-card-image {
+        height: 250px; /* Altura fija para uniformidad */
+        overflow: hidden;
+        background-color: #f0f0f0;
+    }
+    .event-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .event-card-content {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; margin-bottom: 0.5rem;}
+    .event-card-content .price { font-size: 1.1rem; font-weight: 600; color: #444; margin-top: 5px; }
+    
+    .card-footer-custom {
+        margin-top: auto; 
+        border-top: 1px solid #eee;
+        padding: 15px 20px 20px 20px;
+    }
+    .btn-greenway-details {
+        background-color: var(--greenway-primary);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-greenway-details:hover {
+        background-color: #8db303; 
+        color: white;
+    }
+    
+    /* --- Estilos para el Carrusel Horizontal --- */
+    .carousel-container {
+        overflow-x: auto;
+        padding-bottom: 30px; 
+        padding-left: 10px;
+        /* Ocultar barra de scroll en navegadores modernos */
+        scrollbar-width: thin; 
+    }
+    .carousel-track {
+        display: flex;
+        gap: 25px; 
+        width: max-content; 
+    }
+    .carousel-card {
+        width: 350px; 
+        flex-shrink: 0; 
+        display: inline-block;
+        white-space: normal;
+    }
+</style>
+{% endblock %}
 
-    <style>
-        /* --- ESTILOS COMUNES PARA TODO EL SITIO --- */
-        
-        :root {
-            --greenway-primary: #A6D204; /* Verde principal */
-            --greenway-accent: #00b7ff;   /* Naranja (para el chat) */
-            --greenway-yellow-light: #FBEE3F; /* Amarillo alerta */
-            --greenway-blue: #648BFF;       /* Azul info */
-            --greenway-text: #222;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #fafafa;
-            /* El padding-top se añade con JS para que sea dinámico */
-        }
-
-        /* NAVBAR (Común) */
-        .navbar-greenway {
-            background-color: var(--greenway-primary) !important;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            padding: 10px 40px;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1030;
-            transition: transform 0.3s ease-in-out;
-        }
-        .navbar-greenway .navbar-brand, .navbar-greenway .nav-link { color: white !important; font-weight: 600; transition: color 0.3s; }
-        .navbar-greenway .nav-link:hover { color: #222 !important; }
-        .navbar-greenway .btn-light { background-color: white !important; color: var(--greenway-primary) !important; font-weight: 700; border: none; transition: all 0.3s; }
-        .navbar-greenway .btn-light:hover { background-color: #f8f8f8 !important; transform: scale(1.05); }
-        .navbar-hidden { transform: translateY(-100%); }
-
-        /* FOOTER (Común) */
-        .footer-greenway {
-            background-color: #222;
-            color: #ccc;
-        }
-        .footer-greenway h5 { font-weight: 700; color: var(--greenway-primary); font-size: 1.5rem; }
-        .footer-greenway p { font-size: 0.9rem; margin-bottom: 5px; }
-        .footer-greenway strong { color: #fff; }
-        .footer-greenway .copyright { background-color: rgba(0, 0, 0, 0.2); font-size: 0.8rem; }
-
-        /* ANIMATIONS (Común) */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Colores de Alertas (Flash) Personalizados */
-        .alert-success { background-color: var(--greenway-primary); color: white; border: none; }
-        .alert-danger { background-color: #dc3545; color: white; border: none; }
-        .alert-info { background-color: var(--greenway-blue); color: white; border: none; }
-        .alert-warning { background-color: var(--greenway-yellow-light); color: var(--greenway-text); border: none; }
-
-        /* --- ESTILOS DEL CHATBOT (REDISEÑADO MODERNO) --- */
-        #chat-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 65px;
-            height: 65px;
-            /* Degradado moderno */
-            background: linear-gradient(135deg, var(--greenway-primary), #8bc34a);
-            color: white;
-            border-radius: 50%;
-            border: none;
-            font-size: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 8px 24px rgba(166, 210, 4, 0.4);
-            z-index: 1040;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-        }
-        #chat-toggle:hover {
-            transform: scale(1.1) rotate(10deg);
-        }
-
-        #chat-window {
-            position: fixed;
-            bottom: 110px;
-            right: 30px;
-            width: 380px;
-            height: 550px;
-            background-color: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-            z-index: 1039;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            /* Animación de entrada */
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        #chat-window.open {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            visibility: visible;
-        }
-
-        #chat-header {
-            /* CORREGIDO: Se cambió el código incorrecto #9yc33a por #8bc34a */
-            background: linear-gradient(135deg, var(--greenway-primary), #8bc34a);
-            color: white;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        #chat-header h5 { margin: 0; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-        #chat-close-btn { background: none; border: none; color: white; opacity: 0.8; font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;}
-        #chat-close-btn:hover { opacity: 1; }
-
-        #chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background-color: #f9f9f9;
-        }
-
-        /* BURBUJAS DE MENSAJE */
-        .chat-message {
-            padding: 12px 16px;
-            border-radius: 18px;
-            max-width: 85%;
-            line-height: 1.5;
-            font-size: 0.95rem;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .user-message {
-            background-color: var(--greenway-accent); /* Azul/Celeste */
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px; /* Efecto burbuja */
-            box-shadow: 0 2px 5px rgba(0, 183, 255, 0.2);
-        }
-
-        .bot-message {
-            background-color: #ffffff;
-            color: #333;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px; /* Efecto burbuja */
-            border: 1px solid #eee;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        /* Animación de "escribiendo" */
-        .bot-message.loading {
-            color: #888;
-            font-style: italic;
-            background: #f0f0f0;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        #chat-form {
-            display: flex;
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #f0f0f0;
-            gap: 10px;
-        }
-        #chat-input {
-            flex-grow: 1;
-            border: 1px solid #eee;
-            padding: 12px 20px;
-            border-radius: 30px;
-            background-color: #f8f9fa;
-            transition: all 0.2s;
-        }
-        #chat-input:focus {
-            outline: none;
-            background-color: white;
-            border-color: var(--greenway-accent);
-            box-shadow: 0 0 0 3px rgba(0, 183, 255, 0.1);
-        }
-        #chat-submit {
-            background: var(--greenway-accent);
-            border: none;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 10px rgba(0, 183, 255, 0.3);
-        }
-        #chat-submit:hover { transform: scale(1.1); }
-    </style>
-
-    {% block styles %}{% endblock %}
-
-</head>
-<body>
-
-    <nav class="navbar navbar-expand-lg navbar-greenway">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            
-            <div style="width: 100px;"></div> 
-
-            <div class="d-flex mx-auto align-items-center"> 
-                <a class="navbar-brand me-4" href="{{ url_for('home') }}">
-                    GREENWAY 
-                </a>
-                <div class="collapse navbar-collapse show" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('experiencias') }}">Experiencias</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('chats') }}">Chats</a></li>
-                        
-                        {% if session.role == 'admin' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin_panel') }}">Panel de Admin</a>
-                            </li>
-                        {% elif session.role == 'propietaria' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('crear_experiencia_form') }}">Registrar Experiencia</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-            
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="btn btn-sm btn-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if session.user_email %}
-                            {{ session.user_email.split('@')[0] }}
-                        {% else %}
-                            Cuenta
-                        {% endif %}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ url_for('profile') }}">Mi Perfil</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('settings') }}">Configuración</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
-                    </ul>
-                </li>
-            </ul>
+{% block content %}
+    <div class="hero-section">
+        <div id="hero-background-slider">
+            <div class="hero-slide"></div>
+            <div class="hero-slide"></div>
         </div>
-    </nav>
-
-    <div class="container" style="position: relative; z-index: 1025; margin-top: 1rem;">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="mt-2">
-              {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        <div class="hero-content">
+            {% if session['user_email'] %}
+                <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
+            {% endif %}
+            <h1 class="hero-title">Descubre las mejores ofertas para ti</h1>
+            <p class="hero-sub">Basadas en tu actividad reciente en Greenway</p>
+        </div>
     </div>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="text-center footer-greenway mt-5">
-        <div class="container p-4">
-            <section class="mb-4">
-                <h5>GREENWAY</h5>
-                <p>Proyecto Final de Programación Orientada a Objetos</p>
-            </section>
-            <hr>
-            <section class="mt-4">
-                <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Sergio Gabriel Chaves Mosquera</strong><br>
-                        @sergio.gcm
-                    </div>
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Maria Jose Sanchez Portillo</strong><br>
-                        @sanjo0702
-                    </div>
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <strong>Samuel Esteban Reyes Uribe</strong><br>
-                        @kpixa_1036
-                    </div>
+    <section class="events-section">
+        <div class="container"> 
+            
+            <div class="row text-center">
+                <div class="col-12">
+                    <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
+                    <p class="section-subtitle">Descubre las experiencias únicas registradas por nuestr@s propietari@s.</p>
                 </div>
-            </section>
-        </div>
-        <div class="text-center p-3 copyright">
-            © 2025 Copyright: The Greenway Team
-        </div>
-    </footer>
-
-    <div id="chat-window">
-        <div id="chat-header">
-            <div>
-                <h5><i class="bi bi-robot me-2"></i> Asistente IA</h5>
             </div>
-            <button id="chat-close-btn"><i class="bi bi-chevron-down"></i></button>
-        </div>
-        
-        <div id="chat-messages">
-            <div class="bot-message chat-message">
-                👋 ¡Hola! Soy el asistente virtual de Greenway. <br>¿En qué te puedo ayudar hoy?
-            </div>
-        </div>
-        
-        <form id="chat-form">
-            <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off">
-            <button type="submit" id="chat-submit">
-                <i class="bi bi-send-fill"></i>
-            </button>
-        </form>
-    </div>
 
-    <button id="chat-toggle">
-        <i class="bi bi-chat-dots-fill"></i>
-    </button>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let prevScrollPos = window.pageYOffset;
-            const navbar = document.querySelector('.navbar-greenway');
-            
-            // Ajuste dinámico del padding-top del body
-            if (navbar) {
-                document.body.style.paddingTop = navbar.offsetHeight + 'px';
-            }
-            
-            window.onscroll = function() {
-                if (!navbar) return;
-                const currentScrollPos = window.pageYOffset;
-                if (prevScrollPos > currentScrollPos) {
-                    navbar.classList.remove('navbar-hidden');
-                } else {
-                    if (currentScrollPos > navbar.offsetHeight + 50) { 
-                        navbar.classList.add('navbar-hidden');
-                    }
-                }
-                prevScrollPos = currentScrollPos;
-            }
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatWindow = document.getElementById('chat-window');
-            const chatToggle = document.getElementById('chat-toggle');
-            const chatCloseBtn = document.getElementById('chat-close-btn');
-            const chatForm = document.getElementById('chat-form');
-            const chatInput = document.getElementById('chat-input');
-            const chatMessages = document.getElementById('chat-messages');
-
-            // 1. Abrir/Cerrar el chat
-            function toggleChat() {
-                chatWindow.classList.toggle('open');
-                const icon = chatToggle.querySelector('i');
-                if (chatWindow.classList.contains('open')) {
-                    icon.classList.remove('bi-chat-dots-fill');
-                    icon.classList.add('bi-x-lg'); // Icono de X cuando está abierto
-                } else {
-                    icon.classList.remove('bi-x-lg');
-                    icon.classList.add('bi-chat-dots-fill');
-                }
-            }
-
-            if (chatToggle) chatToggle.addEventListener('click', toggleChat);
-            if (chatCloseBtn) chatCloseBtn.addEventListener('click', toggleChat);
-
-            // 2. Enviar el formulario
-            if (chatForm) {
-                chatForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const userMessage = chatInput.value.trim();
-                    if (userMessage === '') return;
-
-                    // Añadir mensaje del usuario
-                    addMessage(userMessage, 'user');
-                    chatInput.value = '';
-
-                    // Mostrar "escribiendo..."
-                    const loader = document.createElement('div');
-                    loader.classList.add('bot-message', 'chat-message', 'loading');
-                    loader.innerHTML = '<i class="bi bi-three-dots"></i> Escribiendo...';
-                    chatMessages.appendChild(loader);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+            <div class="carousel-container">
+                <div class="carousel-track">
                     
-                    // Enviar al backend
-                    fetch('/ask-chatbot', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ pregunta: userMessage })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        loader.remove(); // Quitar loader
-                        if (data.respuesta) {
-                            addMessage(data.respuesta, 'bot');
-                        } else {
-                            addMessage('Lo siento, no pude procesar eso.', 'bot');
-                        }
-                    })
-                    .catch(error => {
-                        loader.remove();
-                        console.error('Error:', error);
-                        addMessage('Error de conexión ⚠️', 'bot');
-                    });
-                });
-            }
+                    {% for experiencia in experiencias %}
+                        <div class="carousel-card"> 
+                            <div class="event-card w-100"> 
+                                <div class="event-card-image">
+                                    
+                                    {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
+                                    
+                                    {% if experiencia.imagenes %}
+                                        {% set image_src = experiencia.imagenes[0] %}
+                                    {% elif experiencia.imagen_url %}
+                                        {% set image_src = experiencia.imagen_url %}
+                                    {% endif %}
 
-            // Función para añadir burbujas de mensaje
-            function addMessage(text, sender) {
-                const messageEl = document.createElement('div');
-                messageEl.classList.add('chat-message');
-                messageEl.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-                messageEl.textContent = text; 
-                chatMessages.appendChild(messageEl);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        });
-    </script>
+                                    <img src="{{ image_src }}" alt="{{ experiencia.nombre }}">
+                                    </div>
+                                <div class="event-card-content">
+                                    <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
+                                    <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
+                                    <p class="text-muted small">
+                                        {{ experiencia.descripcion | truncate(100) }}
+                                    </p>
+                                </div>
+                                <div class="card-footer-custom">
+                                    <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
+                                        Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    {% else %}
+                        <div class="col-12 text-center w-100">
+                            <p class="fs-5 text-muted">Aún no hay experiencias registradas.</p>
+                        </div>
+                    {% endfor %}
+                    
+                </div> </div> </div> 
+    </section>
+{% endblock %}
 
-    <script>
-    setTimeout(function() {
-        var alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            var bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 4000); 
-    </script>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- SCRIPT DEL SLIDER DEL HERO ---
+        const heroImages = [
+            "{{ url_for('static', filename='images/Mariposa.jpg') }}",
+            "{{ url_for('static', filename='images/Apicultores.jpg') }}",
+            "{{ url_for('static', filename='images/Apiario.jpg') }}",
+            "{{ url_for('static', filename='images/Portada-Mariposario.png') }}"
+        ];
 
-</body>
-</html>
+        const slides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+        let imageIndex = 0;
+
+        function changeHeroBackground() {
+            imageIndex = (imageIndex + 1) % heroImages.length;
+            const nextSlide = (currentSlide + 1) % slides.length;
+
+            slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
+            slides[nextSlide].classList.add('active');
+            slides[currentSlide].classList.remove('active');
+            currentSlide = nextSlide;
+        }
+
+        if (slides.length > 0) {
+            slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
+            slides[0].classList.add('active');
+            setInterval(changeHeroBackground, 6000);
+        }
+    }); 
+</script>
+{% endblock %}
