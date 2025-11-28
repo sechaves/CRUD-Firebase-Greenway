@@ -22,6 +22,16 @@
   }
   .chat-item:hover { background: #f5f5f5; }
   .chat-item.active { background: #e3f2fd; }
+  
+  /* Estilo para el texto previo */
+  .preview-text {
+      font-size: 0.8rem;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+  }
 </style>
 {% endblock %}
 
@@ -95,12 +105,10 @@
 
   // --- FUNCIÓN PARA OBTENER EL NOMBRE REAL ---
   async function getUserName(userId, elementId) {
-      // Intentar buscar en propietarios
       db.ref('propietarios/' + userId).once('value').then(snap => {
           if (snap.exists()) {
               document.getElementById(elementId).innerText = snap.val().nombre;
           } else {
-              // Si no, buscar en usuarios
               db.ref('usuarios/' + userId).once('value').then(snap2 => {
                   if (snap2.exists()) {
                       document.getElementById(elementId).innerText = snap2.val().nombre;
@@ -129,14 +137,39 @@
               foundAny = true;
               
               const parts = key.split('_');
-              const expId = parts[1];
+              const expId = parts[1]; // Aún tenemos el ID por si acaso
               const userA = parts[2];
               const userB = parts[3];
 
               let otherUserId = (userA === MY_USER_ID) ? userB : userA;
-              
-              // Generamos un ID único para el <span> del nombre
               const nameSpanId = `name-${key}`; 
+
+              // --- NUEVA LÓGICA: OBTENER EL ÚLTIMO MENSAJE ---
+              let previewText = "<i>Escribe el primer mensaje...</i>";
+              const chatData = allChats[key];
+              
+              if (chatData.messages) {
+                  // Convertimos los mensajes (diccionario) a array
+                  const msgsArray = Object.values(chatData.messages);
+                  // Ordenamos por fecha (timestamp)
+                  msgsArray.sort((a, b) => a.timestamp - b.timestamp);
+                  
+                  // Sacamos el último
+                  const lastMsg = msgsArray[msgsArray.length - 1];
+                  
+                  // Cortamos el texto si es muy largo
+                  if (lastMsg.text.length > 25) {
+                      previewText = lastMsg.text.substring(0, 25) + "...";
+                  } else {
+                      previewText = lastMsg.text;
+                  }
+                  
+                  // Si soy yo el que lo envió, le pongo "Tú:"
+                  if (lastMsg.sender_id === MY_USER_ID) {
+                      previewText = "<strong>Tú:</strong> " + previewText;
+                  }
+              }
+              // -----------------------------------------------
 
               const div = document.createElement('div');
               const isActive = (key === ROOM_ID) ? 'active' : '';
@@ -148,7 +181,7 @@
                       <div style="font-weight:bold;font-size:0.9rem;">
                         <span id="${nameSpanId}">Cargando...</span>
                       </div>
-                      <small class="text-muted" style="font-size:0.75rem;">Exp: ${expId}</small>
+                      <div class="preview-text">${previewText}</div>
                   </div>
               `;
 
@@ -157,8 +190,6 @@
               };
 
               chatListContainer.appendChild(div);
-              
-              // ¡Llamamos a la función mágica para buscar el nombre!
               getUserName(otherUserId, nameSpanId);
           }
       });
@@ -168,7 +199,7 @@
       }
   });
 
-  // --- LOGICA DE MENSAJES (IGUAL QUE ANTES) ---
+  // --- LOGICA DE MENSAJES (DERECHA) ---
   function sendMessage() {
     const text = msgInput.value.trim();
     if (!text) return;
