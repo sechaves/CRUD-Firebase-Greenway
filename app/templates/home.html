@@ -15,8 +15,9 @@
         text-align: center;
         background-color: #333;
     }
-    #hero-background-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    /* El slide es un div que tendrá la imagen de fondo via JS */
+    #hero-background-slider { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
+    }
     .hero-slide { 
         position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
         background-size: cover; background-position: center; 
@@ -24,7 +25,17 @@
     }
     .hero-slide.active { opacity: 1; }
     
-    .hero-content { position: relative; z-index: 2; color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; }
+    /* Capa oscura para que el texto se lea mejor */
+    .hero-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4); z-index: 1;
+    }
+
+    .hero-content { 
+        position: relative; z-index: 2; color: #fff; 
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8); 
+        max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; 
+    }
     .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
     .hero-sub { font-weight: 500; font-size: 1.1rem; }
 
@@ -62,15 +73,15 @@
 {% block content %}
 
 {% set correcciones_manuales = {
-    'LaMesa': 'https://i.postimg.cc/PLACEHOLDER_LINK.jpg',
-    'Medellin': 'https://i.postimg.cc/PLACEHOLDER_LINK.jpg'
+    'Travis': 'https://i.postimg.cc/PqM8XyJz/travis.jpg',
+    'LaMesa': 'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg'
 } %}
 
 <div class="hero-section">
     <div id="hero-background-slider">
         <div class="hero-slide"></div>
         <div class="hero-slide"></div>
-    </div>
+        <div class="hero-overlay"></div> </div>
 
     <div class="hero-content">
         {% if session['user_email'] %}
@@ -145,13 +156,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // --- SCRIPT DEL SLIDER DEL HERO ---
-        // Asegúrate de que estas imágenes existan en tu carpeta static/images
+        // --- SCRIPT DEL SLIDER DEL HERO (USANDO LINKS EXTERNOS SEGUROS) ---
         const heroImages = [
-            "{{ url_for('static', filename='images/Mariposa.jpg') }}",
-            "{{ url_for('static', filename='images/Apicultores.jpg') }}",
-            "{{ url_for('static', filename='images/Apiario.jpg') }}",
-            "{{ url_for('static', filename='images/Portada-Mariposario.png') }}"
+            'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
+            'https://wallpapercave.com/wp/wp13667471.jpg',
+            'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
+            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
+            'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg'
         ];
 
         const slides = document.querySelectorAll('.hero-slide');
@@ -176,7 +187,7 @@
 
         // Inicializar si hay slides
         if (slides.length > 0) {
-            // Poner la primera imagen
+            // Poner la primera imagen inmediatamente
             slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
             slides[0].classList.add('active');
             
