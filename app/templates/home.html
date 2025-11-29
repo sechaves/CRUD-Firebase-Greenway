@@ -4,147 +4,203 @@
 
 {% block styles %}
 <style>
-    /* Hero Styles */
-    .hero-section { height: 80vh; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; background-color: #333; overflow: hidden; }
-    #hero-background-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    .hero-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; }
+    /* --- HERO SECTION --- */
+    .hero-section {
+        height: 85vh; /* Un poco más alto para impacto */
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #222;
+    }
+    #hero-background-slider { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
+    }
+    .hero-slide { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background-size: cover; background-position: center; 
+        opacity: 0; transition: opacity 1.5s ease-in-out; 
+    }
     .hero-slide.active { opacity: 1; }
-    .hero-content { position: relative; z-index: 2; color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; }
-    .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
     
-    /* Cards Styles */
-    .events-section { padding: 60px 0; overflow: hidden; }
-    .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; }
-    .section-subtitle { font-size: 1.1rem; color: #555; margin-bottom: 50px; }
-    
-    .event-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s; height: 100%; display: flex; flex-direction: column; }
-    .event-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-    .event-card-image { height: 250px; overflow: hidden; background: #eee; }
-    .event-card-image img { width: 100%; height: 100%; object-fit: cover; }
-    .event-card-content { padding: 20px; flex-grow: 1; }
-    .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; margin-bottom: 0.5rem;}
-    .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 15px 20px; }
-    .btn-greenway-details { background-color: var(--greenway-primary); color: white; font-weight: 600; }
-    .btn-greenway-details:hover { background-color: #8db303; color: white; }
+    /* Capa oscura para que el texto blanco se lea perfecto */
+    .hero-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+        z-index: 1;
+    }
 
-    /* Carrusel */
-    .carousel-container { overflow-x: auto; padding-bottom: 30px; padding-left: 10px; scrollbar-width: thin; }
-    .carousel-track { display: flex; gap: 25px; width: max-content; }
-    .carousel-card { width: 350px; flex-shrink: 0; display: inline-block; }
+    .hero-content { 
+        position: relative; z-index: 2; color: #fff; 
+        text-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+        max-width: 800px; padding: 0 20px; 
+        animation: fadeIn 1.2s ease-in-out; 
+    }
+    .hero-title { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; letter-spacing: -1px; }
+    .hero-sub { font-weight: 500; font-size: 1.3rem; margin-bottom: 30px; opacity: 0.9; }
+
+    /* --- CARRUSEL DE EXPERIENCIAS --- */
+    .events-section { padding: 80px 0; background-color: #fff; }
+    .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; text-transform: uppercase;}
+    .section-subtitle { font-size: 1.1rem; color: #666; margin-bottom: 50px; }
+
+    /* Estilos Tarjetas */
+    .event-card {
+        background-color: #fff; border-radius: 20px; overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); transition: all 0.3s ease;
+        height: 100%; display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.05);
+    }
+    .event-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); }
+    
+    .event-card-image { height: 260px; overflow: hidden; background-color: #f0f0f0; position: relative;}
+    .event-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .event-card:hover .event-card-image img { transform: scale(1.05); } /* Zoom suave al pasar mouse */
+    
+    .event-card-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+    .event-card-content h5 { font-weight: 800; color: var(--greenway-text); font-size: 1.3rem; margin-bottom: 0.5rem;}
+    .price-badge { 
+        display: inline-block; background: var(--greenway-primary); color: white; 
+        padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px;
+    }
+    
+    .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 20px; background: #fafafa;}
+    .btn-greenway-details { 
+        background-color: #222; color: white; font-weight: 700; border-radius: 12px; padding: 10px; width: 100%; display: block; text-align: center; text-decoration: none; transition: 0.3s;
+    }
+    .btn-greenway-details:hover { background-color: var(--greenway-primary); color: white; }
+
+    /* Carrusel Horizontal */
+    .carousel-container { overflow-x: auto; padding-bottom: 40px; padding-left: 5px; scrollbar-width: thin; -webkit-overflow-scrolling: touch;}
+    .carousel-track { display: flex; gap: 30px; width: max-content; padding: 10px;}
+    .carousel-card { width: 340px; flex-shrink: 0; display: inline-block; white-space: normal; }
 </style>
 {% endblock %}
 
 {% block content %}
 
-{% set correcciones_manuales = {} %}
-
+{% set imagenes_experiencias = {
+    'Travis': 'https://i.postimg.cc/PqM8XyJz/travis.jpg',
+    'LaMesa': url_for('static', filename='images/hero1.jpg'), 
+    'Abejas': 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=800&q=80'
+} %}
 <div class="hero-section">
     <div id="hero-background-slider">
         <div class="hero-slide"></div>
         <div class="hero-slide"></div>
+        <div class="hero-overlay"></div> 
     </div>
+
     <div class="hero-content">
         {% if session['user_email'] %}
-            <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
+            <p class="mb-2">👋 Hola, {{ session['user_email'].split('@')[0] }}</p>
         {% endif %}
-        <h1 class="hero-title">Descubre las mejores ofertas para ti</h1>
-        <p class="hero-sub">Basadas en tu actividad reciente en Greenway</p>
+        <h1 class="hero-title">Encuentra tu refugio <br> <span style="color: var(--greenway-primary);">en la naturaleza</span></h1>
+        <p class="hero-sub">Experiencias únicas de ecoturismo en el Santuario.</p>
+        <a href="#explorar" class="btn btn-lg btn-light fw-bold px-5 py-3 rounded-pill mt-3 shadow-lg" style="color: var(--greenway-text);">Explorar Ahora</a>
     </div>
 </div>
 
-<section class="events-section">
+<section class="events-section" id="explorar">
     <div class="container">
-        <div class="row text-center">
+
+        <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
-                <p class="section-subtitle">Descubre experiencias únicas</p>
+                <h2 class="section-title">Experiencias Destacadas</h2>
+                <p class="section-subtitle">Descubre los lugares mejor calificados por nuestra comunidad</p>
             </div>
         </div>
 
         <div class="carousel-container">
             <div class="carousel-track">
+
                 {% for experiencia in experiencias %}
                     <div class="carousel-card">
-                        <div class="event-card w-100">
+                        <div class="event-card">
                             <div class="event-card-image">
-                                
-                                {% set default_img = 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80' %}
-                                {% set final_img = default_img %}
 
-                                {# 1. Revisar correcciones manuales #}
-                                {% if experiencia.nombre in correcciones_manuales %}
-                                    {% set final_img = correcciones_manuales[experiencia.nombre] %}
+                                {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
+
+                                {% if experiencia.nombre in imagenes_experiencias %}
+                                    {% set image_src = imagenes_experiencias[experiencia.nombre] %}
                                 
-                                {# 2. Revisar lista de imágenes (Detectando si es lista o diccionario) #}
-                                {% elif experiencia.imagenes %}
-                                    {% if experiencia.imagenes is mapping %} 
-                                        {# Si Firebase devolvió un diccionario rarámuri, sacamos el primer valor #}
-                                        {% set final_img = experiencia.imagenes.values() | list | first %}
-                                    {% elif experiencia.imagenes is sequence %}
-                                        {# Si es una lista normal #}
-                                        {% set final_img = experiencia.imagenes[0] %}
-                                    {% endif %}
+                                {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
+                                    {% set image_src = experiencia.imagenes[0] %}
                                 
-                                {# 3. Revisar imagen única antigua #}
                                 {% elif experiencia.imagen_url %}
-                                    {% set final_img = experiencia.imagen_url %}
+                                    {% set image_src = experiencia.imagen_url %}
                                 {% endif %}
 
-                                <img src="{{ final_img }}" alt="{{ experiencia.nombre }}" 
-                                     onerror="this.src='{{ default_img }}'">
-                                </div>
+                                <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80'">
+
+                            </div>
                             
                             <div class="event-card-content">
+                                <div><span class="price-badge">${{ "{:,.0f}".format(experiencia.precio_noche) }} COP</span></div>
                                 <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
-                                <p class="price">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
-                                <p class="text-muted small">
-                                    {{ experiencia.descripcion | truncate(80) }}
+                                <p class="text-muted small mb-0">
+                                    {{ experiencia.descripcion | truncate(90) }}
                                 </p>
                             </div>
+                            
                             <div class="card-footer-custom">
-                                <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn btn-greenway-details w-100">
-                                    Ver Detalles
+                                <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn-greenway-details">
+                                    Ver Detalles <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="col-12 text-center w-100">
-                        <p class="fs-5 text-muted">Aún no hay experiencias.</p>
+                    <div class="col-12 text-center w-100 py-5">
+                        <i class="bi bi-tree text-muted" style="font-size: 3rem;"></i>
+                        <p class="fs-5 text-muted mt-3">Aún no hay experiencias disponibles.</p>
                     </div>
                 {% endfor %}
-            </div> 
-        </div> 
-    </div> 
+
+            </div> </div> </div> 
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- CONFIGURACIÓN DEL HERO SLIDER ---
+        // Pon aquí los nombres de tus imágenes en app/static/images/
         const heroImages = [
-            'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
-            'https://wallpapercave.com/wp/wp13667471.jpg',
-            'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
-            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg'
+            "{{ url_for('static', filename='images/hero1.jpg') }}", 
+            "{{ url_for('static', filename='images/hero2.jpg') }}",
+            "{{ url_for('static', filename='images/hero3.jpg') }}"
         ];
+        // -------------------------------------
+
         const slides = document.querySelectorAll('.hero-slide');
         let currentSlide = 0;
         let imageIndex = 0;
 
         function changeHeroBackground() {
+            // Si no hay imágenes, no hacemos nada
+            if (heroImages.length === 0) return;
+
             imageIndex = (imageIndex + 1) % heroImages.length;
             const nextSlide = (currentSlide + 1) % slides.length;
+
             slides[nextSlide].style.backgroundImage = `url('${heroImages[imageIndex]}')`;
             slides[nextSlide].classList.add('active');
             slides[currentSlide].classList.remove('active');
             currentSlide = nextSlide;
         }
 
-        if (slides.length > 0) {
+        // Inicializar
+        if (slides.length > 0 && heroImages.length > 0) {
+            // Poner la primera imagen
             slides[0].style.backgroundImage = `url('${heroImages[0]}')`;
             slides[0].classList.add('active');
-            setInterval(changeHeroBackground, 6000);
+            
+            // Cambiar cada 5 segundos
+            setInterval(changeHeroBackground, 5000);
         }
     }); 
 </script>
