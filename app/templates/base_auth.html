@@ -9,47 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- Estilos Comunes de base_auth.html --- */
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-        }
-
-        :root {
-            --greenway-primary: #A6D204;
-            --greenway-accent: #6B8BFF;
-            --greenway-text: #222;
-        }
+        body { font-family: 'Montserrat', sans-serif; color: #333; }
+        :root { --greenway-primary: #A6D204; --greenway-accent: #6B8BFF; --greenway-text: #222; }
 
         /* Slider de Fondo */
-        #background-slider {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
+        #background-slider { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .background-slide { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            opacity: 0; transition: opacity 1.5s ease-in-out; 
         }
-        .background-slide {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-size: cover;
-            background-position: center center;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-        .background-slide.active {
-            opacity: 1;
-        }
+        .background-slide.active { opacity: 1; }
 
-        /* Contenedor principal (para centrar) */
-        .auth-container {
-            position: relative;
-            z-index: 2;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        .auth-container { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
     </style>
 
     {% block styles %}{% endblock %}
@@ -74,8 +46,7 @@
                 'https://wallpapercave.com/wp/wp13667471.jpg',
                 'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
                 'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
-                'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
-                'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
+                'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg'
             ];
 
             const slides = document.querySelectorAll('.background-slide');
