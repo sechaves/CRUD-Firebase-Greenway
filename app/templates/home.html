@@ -1,104 +1,188 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Autenticación{% endblock %} - GREENWAY</title>
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block styles %}
+<style>
+    /* --- HERO SECTION --- */
+    .hero-section {
+        height: 85vh;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #222;
+    }
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    #hero-background-slider { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
+    }
     
-    <style>
-        /* --- Estilos Comunes de base_auth.html --- */
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-        }
-
-        :root {
-            --greenway-primary: #A6D204;
-            --greenway-accent: #6B8BFF;
-            --greenway-text: #222;
-        }
-
-        /* Slider de Fondo */
-        #background-slider {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-        }
-        .background-slide {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-size: cover;
-            background-position: center center;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-        .background-slide.active {
-            opacity: 1;
-        }
-
-        /* Contenedor principal (para centrar) */
-        .auth-container {
-            position: relative;
-            z-index: 2;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-    </style>
-
-    {% block styles %}{% endblock %}
-</head>
-<body>
+    /* Esta es la clase que usa el Home para el fondo */
+    .hero-slide { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background-size: cover; background-position: center; 
+        opacity: 0; transition: opacity 1.5s ease-in-out; 
+    }
+    .hero-slide.active { opacity: 1; }
     
-    <div id="background-slider">
-        <div class="background-slide"></div>
-        <div class="background-slide"></div>
+    /* Capa oscura para leer el texto */
+    .hero-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4); z-index: 1;
+    }
+
+    .hero-content { 
+        position: relative; z-index: 2; color: #fff; 
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8); 
+        max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; 
+    }
+    .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; }
+    .hero-sub { font-weight: 500; font-size: 1.1rem; }
+
+    /* --- TARJETAS --- */
+    .events-section { padding: 60px 0; overflow: hidden; }
+    .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; }
+    .section-subtitle { font-size: 1.1rem; color: #555; margin-bottom: 50px; }
+
+    .event-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s; height: 100%; display: flex; flex-direction: column; }
+    .event-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+    .event-card-image { height: 250px; overflow: hidden; background: #f0f0f0; }
+    .event-card-image img { width: 100%; height: 100%; object-fit: cover; }
+    .event-card-content { padding: 20px; flex-grow: 1; }
+    .event-card-content h5 { font-weight: 700; color: var(--greenway-text); font-size: 1.4rem; margin-bottom: 0.5rem;}
+    .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 15px 20px; }
+    .btn-greenway-details { background-color: var(--greenway-primary); color: white; font-weight: 600; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 10px;}
+    .btn-greenway-details:hover { background-color: #8db303; color: white; }
+
+    /* Carrusel Horizontal */
+    .carousel-container { overflow-x: auto; padding-bottom: 30px; padding-left: 10px; scrollbar-width: thin; }
+    .carousel-track { display: flex; gap: 25px; width: max-content; }
+    .carousel-card { width: 350px; flex-shrink: 0; display: inline-block; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-section">
+    <div id="hero-background-slider">
+        <div class="hero-slide"></div>
+        <div class="hero-slide"></div>
+        <div class="hero-overlay"></div>
     </div>
 
-    <main class="container auth-container">
-        {% block content %}{% endblock %}
-    </main>
+    <div class="hero-content">
+        {% if session['user_email'] %}
+            <p>¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
+        {% endif %}
+        <h1 class="hero-title">Descubre las mejores ofertas para ti</h1>
+        <p class="hero-sub">Basadas en tu actividad reciente en Greenway</p>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const images = [
-                'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
-                'https://wallpapercave.com/wp/wp13667471.jpg',
-                'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
-                'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
-                'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
-                'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
-            ];
+<section class="events-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-12">
+                <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
+                <p class="section-subtitle">Descubre experiencias únicas</p>
+            </div>
+        </div>
 
-            const slides = document.querySelectorAll('.background-slide');
-            let currentSlide = 0;
-            let imageIndex = 0;
+        <div class="carousel-container">
+            <div class="carousel-track">
+                
+                {% set correcciones_manuales = {
+                    'Travis': 'https://i.postimg.cc/PqM8XyJz/travis.jpg',
+                    'LaMesa': 'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg'
+                } %}
 
-            function changeBackground() {
-                imageIndex = (imageIndex + 1) % images.length;
-                const nextSlide = (currentSlide + 1) % slides.length;
-                slides[nextSlide].style.backgroundImage = `url('${images[imageIndex]}')`;
-                slides[nextSlide].classList.add('active');
-                slides[currentSlide].classList.remove('active');
-                currentSlide = nextSlide;
-            }
+                {% for experiencia in experiencias %}
+                    <div class="carousel-card">
+                        <div class="event-card w-100">
+                            <div class="event-card-image">
+                                {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
 
-            if (slides.length > 0) {
-                slides[0].style.backgroundImage = `url('${images[0]}')`;
-                slides[0].classList.add('active');
-                setInterval(changeBackground, 6000);
-            }
-        });
-    </script>
+                                {% if experiencia.nombre in correcciones_manuales %}
+                                    {% set image_src = correcciones_manuales[experiencia.nombre] %}
+                                {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
+                                    {% set image_src = experiencia.imagenes[0] %}
+                                {% elif experiencia.imagen_url %}
+                                    {% set image_src = experiencia.imagen_url %}
+                                {% endif %}
 
-    {% block scripts %}{% endblock %}
-</body>
-</html>
+                                <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" 
+                                     onerror="this.src='https://via.placeholder.com/400x300.png?text=Error'">
+                            </div>
+                            
+                            <div class="event-card-content">
+                                <h5 class="text-truncate">{{ experiencia.nombre }}</h5>
+                                <p class="mb-1 fw-bold text-muted">Desde {{ "${:,.0f}".format(experiencia.precio_noche) }} COP</p>
+                                <p class="text-muted small">
+                                    {{ experiencia.descripcion | truncate(80) }}
+                                </p>
+                            </div>
+                            <div class="card-footer-custom">
+                                <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn-greenway-details">
+                                    Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center w-100">
+                        <p class="fs-5 text-muted">Aún no hay experiencias.</p>
+                    </div>
+                {% endfor %}
+
+            </div> 
+        </div> 
+    </div> 
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- SCRIPT DEL LOGIN ADAPTADO PARA EL HOME ---
+        // Usamos tus mismos links que SI funcionan
+        const images = [
+            'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
+            'https://wallpapercave.com/wp/wp13667471.jpg',
+            'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
+            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
+            'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
+            'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
+        ];
+
+        // CAMBIO IMPORTANTE: Aquí buscamos '.hero-slide' (que es la clase del Home)
+        // en lugar de '.background-slide' (que es la del Login)
+        const slides = document.querySelectorAll('.hero-slide');
+        
+        let currentSlide = 0;
+        let imageIndex = 0;
+
+        function changeBackground() {
+            imageIndex = (imageIndex + 1) % images.length;
+            const nextSlide = (currentSlide + 1) % slides.length;
+
+            slides[nextSlide].style.backgroundImage = `url('${images[imageIndex]}')`;
+            slides[nextSlide].classList.add('active');
+            slides[currentSlide].classList.remove('active');
+            
+            currentSlide = nextSlide;
+        }
+
+        if (slides.length > 0) {
+            // Poner la primera imagen al iniciar
+            slides[0].style.backgroundImage = `url('${images[0]}')`;
+            slides[0].classList.add('active');
+            
+            setInterval(changeBackground, 6000);
+        }
+    }); 
+</script>
+{% endblock %}
