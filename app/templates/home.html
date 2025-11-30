@@ -4,9 +4,15 @@
 
 {% block styles %}
 <style>
+    /* --- CORRECCIÓN DEL ESPACIO SUPERIOR --- */
+    /* Esto obliga a que la imagen suba hasta el tope, ignorando la navbar */
+    body {
+        padding-top: 0 !important;
+    }
+
     /* --- HERO SECTION --- */
     .hero-section {
-        height: 90vh; /* Alto casi completo */
+        height: 90vh; /* Altura imponente */
         position: relative;
         overflow: hidden;
         display: flex;
@@ -14,92 +20,91 @@
         justify-content: center;
         text-align: center;
         background-color: #222;
+        margin-top: 0;
     }
     
-    /* EL FONDO DEL SLIDER */
-    .hero-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        opacity: 0;
-        transition: opacity 1.5s ease-in-out;
-        z-index: 0;
+    #hero-background-slider { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; 
     }
     
-    /* CLASE PARA MOSTRAR LA IMAGEN */
-    .hero-bg.active {
-        opacity: 1;
+    .hero-slide { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background-size: cover; background-position: center; 
+        opacity: 0; transition: opacity 1.5s ease-in-out; 
     }
-
-    /* CAPA OSCURA (Para que se lean las letras) */
+    .hero-slide.active { opacity: 1; }
+    
+    /* --- CORRECCIÓN DE LA OSCURIDAD --- */
     .hero-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.4); 
+        /* Degradado suave: Muy transparente arriba, un poco más oscuro abajo para el texto */
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4)); 
         z-index: 1;
     }
 
-    /* CONTENIDO (TEXTO) */
-    .hero-content {
-        position: relative;
-        z-index: 2;
-        color: #fff;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-        padding: 20px;
-        animation: fadeIn 1.5s ease;
+    .hero-content { 
+        position: relative; z-index: 2; color: #fff; 
+        text-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+        max-width: 800px; padding: 0 20px; animation: fadeIn 1.2s ease-in-out; 
+        margin-top: 60px; /* Para bajar un poco el texto y que no pegue con la navbar */
     }
-    .hero-title { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
-    .hero-sub { font-size: 1.2rem; font-weight: 500; }
+    /* Texto más grande y moderno */
+    .hero-title { font-size: 3.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; letter-spacing: -1px; }
+    .hero-sub { font-weight: 500; font-size: 1.4rem; margin-bottom: 30px; opacity: 0.95; }
 
-    /* --- TARJETAS DE EXPERIENCIAS --- */
-    .events-section { padding: 60px 0; }
-    .section-title { font-weight: 900; font-size: 2rem; color: var(--greenway-text); margin-bottom: 10px; }
+    /* --- TARJETAS --- */
+    .events-section { padding: 80px 0; background: #fff; }
+    .section-title { font-weight: 900; font-size: 2.5rem; color: var(--greenway-text); margin-bottom: 10px; text-transform: uppercase; }
+    .section-subtitle { font-size: 1.1rem; color: #666; margin-bottom: 50px; }
+
+    .event-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.05); }
+    .event-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+    .event-card-image { height: 260px; overflow: hidden; background: #f0f0f0; }
+    .event-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .event-card:hover .event-card-image img { transform: scale(1.05); }
     
-    /* Estilos Tarjeta */
-    .event-card {
-        background: #fff; border-radius: 20px; overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s;
-        height: 100%; display: flex; flex-direction: column; border: 1px solid #eee;
-    }
-    .event-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-    .event-card-image { height: 220px; overflow: hidden; background: #f0f0f0; }
-    .event-card-image img { width: 100%; height: 100%; object-fit: cover; }
-    .event-card-content { padding: 20px; flex-grow: 1; }
-    .card-footer-custom { padding: 15px; border-top: 1px solid #eee; }
-    .btn-greenway-details { background: var(--greenway-primary); color: white; width: 100%; font-weight: 700; border-radius: 10px; padding: 10px; text-decoration: none; display: block; text-align: center; }
-    .btn-greenway-details:hover { background: #8db303; color: white; }
+    .event-card-content { padding: 25px; flex-grow: 1; }
+    .price-badge { display: inline-block; background: var(--greenway-primary); color: white; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
+    
+    .card-footer-custom { margin-top: auto; border-top: 1px solid #eee; padding: 20px; background: #fafafa; }
+    .btn-greenway-details { background-color: #222; color: white; font-weight: 700; border-radius: 12px; padding: 12px; width: 100%; display: block; text-align: center; text-decoration: none; transition: 0.3s; }
+    .btn-greenway-details:hover { background-color: var(--greenway-primary); color: white; }
 
-    /* Carrusel */
-    .carousel-container { overflow-x: auto; padding-bottom: 20px; padding-left: 5px; scrollbar-width: thin; }
-    .carousel-track { display: flex; gap: 20px; width: max-content; }
-    .carousel-card { width: 320px; flex-shrink: 0; display: inline-block; }
+    /* Carrusel Horizontal */
+    .carousel-container { overflow-x: auto; padding-bottom: 40px; padding-left: 5px; scrollbar-width: thin; }
+    .carousel-track { display: flex; gap: 30px; width: max-content; padding: 10px; }
+    .carousel-card { width: 340px; flex-shrink: 0; display: inline-block; }
 </style>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-section">
-    <div class="hero-bg active" style="background-image: url('https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg');"></div>
-    <div class="hero-bg"></div> <div class="hero-overlay"></div>
+    <div id="hero-background-slider">
+        <div class="hero-slide"></div>
+        <div class="hero-slide"></div>
+        <div class="hero-overlay"></div> </div>
 
     <div class="hero-content">
         {% if session['user_email'] %}
-            <p class="mb-2">¡Hola, {{ session['user_email'].split('@')[0] }}!</p>
+            <p class="mb-2 fw-bold text-uppercase" style="letter-spacing: 2px; font-size: 0.9rem;">👋 Hola, {{ session['user_email'].split('@')[0] }}</p>
         {% endif %}
-        <h1 class="hero-title">Tu próxima aventura comienza aquí</h1>
-        <p class="hero-sub">Descubre las mejores experiencias en el Santuario.</p>
+        
+        <h1 class="hero-title">Conecta con <br> <span style="color: var(--greenway-primary);">la Naturaleza</span></h1>
+        <p class="hero-sub">Experiencias inolvidables, paisajes únicos y descanso total.</p>
+        
+        <a href="#explorar" class="btn btn-lg btn-light fw-bold px-5 py-3 rounded-pill mt-4 shadow-lg" style="color: var(--greenway-text);">
+            Explorar Destinos
+        </a>
     </div>
 </div>
 
-<section class="events-section">
+<section class="events-section" id="explorar">
     <div class="container">
-        <div class="row text-center mb-4">
+        <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="section-title">EXPERIENCIAS DESTACADAS</h2>
-                <p class="text-muted">Explora lugares únicos recomendados para ti</p>
+                <h2 class="section-title">Experiencias Destacadas</h2>
+                <p class="section-subtitle">Lugares mágicos recomendados por nuestra comunidad</p>
             </div>
         </div>
 
@@ -113,9 +118,10 @@
 
                 {% for experiencia in experiencias %}
                     <div class="carousel-card">
-                        <div class="event-card">
+                        <div class="event-card w-100">
                             <div class="event-card-image">
                                 {% set image_src = 'https://via.placeholder.com/400x300.png?text=Sin+Imagen' %}
+
                                 {% if experiencia.nombre in correcciones_manuales %}
                                     {% set image_src = correcciones_manuales[experiencia.nombre] %}
                                 {% elif experiencia.imagenes and experiencia.imagenes|length > 0 %}
@@ -125,73 +131,75 @@
                                 {% endif %}
 
                                 <img src="{{ image_src }}" alt="{{ experiencia.nombre }}" 
-                                     onerror="this.src='https://via.placeholder.com/400x300.png?text=Error'">
+                                     onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80'">
                             </div>
                             
                             <div class="event-card-content">
+                                <div><span class="price-badge">${{ "{:,.0f}".format(experiencia.precio_noche) }} COP</span></div>
                                 <h5 class="fw-bold text-truncate">{{ experiencia.nombre }}</h5>
-                                <p class="text-success fw-bold">Desde ${{ "{:,.0f}".format(experiencia.precio_noche) }}</p>
-                                <p class="text-muted small mb-0">{{ experiencia.descripcion | truncate(60) }}</p>
+                                <p class="text-muted small mb-0">
+                                    {{ experiencia.descripcion | truncate(90) }}
+                                </p>
                             </div>
-                            
                             <div class="card-footer-custom">
                                 <a href="{{ url_for('experiencia_detalle', experiencia_id=experiencia.id) }}" class="btn-greenway-details">
-                                    Ver Detalles
+                                    Ver Detalles <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="col-12 text-center w-100 p-5">
-                        <p class="text-muted">No hay experiencias disponibles aún.</p>
+                    <div class="col-12 text-center w-100 py-5">
+                        <i class="bi bi-tree text-muted" style="font-size: 3rem;"></i>
+                        <p class="fs-5 text-muted mt-3">Aún no hay experiencias disponibles.</p>
                     </div>
                 {% endfor %}
 
-            </div>
-        </div>
-    </div>
+            </div> 
+        </div> 
+    </div> 
 </section>
-
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // TUS IMÁGENES QUE SÍ FUNCIONAN
+        // --- IMÁGENES DEL FONDO (CARRUSEL AUTOMÁTICO) ---
+        // Aquí puedes agregar más links si quieres que cambie
         const images = [
             'https://visitarmedellin.com/wp-content/uploads/2023/06/bubble-sky-glamping.jpg',
             'https://wallpapercave.com/wp/wp13667471.jpg',
             'https://storage.googleapis.com/jm-gcp-bethestory-p-12po-bucket/uploads/colombia-biodiversity.jpg',
-            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg',
-            'https://www.constructorapoporo.com/wp-content/uploads/2020/10/Invertir-en-el-eje-1536x864.jpg',
-            'https://content.r9cdn.net/rimg/dimg/7b/90/91d28f06-city-52322-1694f3c3799.jpg?width=1366&height=768&xhint=1416&yhint=1122&crop=true'
+            'https://hotelescheveres.com/wp-content/uploads/2025/01/hoteles-en-san-andres-frente-al-mar-scaled.jpg'
         ];
 
-        // Seleccionamos los divs del fondo
-        const slides = document.querySelectorAll('.hero-bg');
-        let currentSlide = 0; // Índice del div actual (0 o 1)
-        let imageIndex = 0;   // Índice de la imagen en el array
+        const slides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+        let imageIndex = 0;
 
         function changeBackground() {
-            // Siguiente imagen
+            // Siguiente índice de imagen
             imageIndex = (imageIndex + 1) % images.length;
             
-            // Alternar entre los dos divs (0 y 1) para el efecto crossfade
+            // Alternar entre los dos divs del slide (efecto crossfade)
             const nextSlide = (currentSlide + 1) % slides.length;
 
-            // Poner la imagen en el div "oculto"
             slides[nextSlide].style.backgroundImage = `url('${images[imageIndex]}')`;
-            
-            // Hacer visible el nuevo y ocultar el viejo
             slides[nextSlide].classList.add('active');
             slides[currentSlide].classList.remove('active');
             
             currentSlide = nextSlide;
         }
 
-        // Iniciar el ciclo
-        setInterval(changeBackground, 6000);
-    });
+        if (slides.length > 0) {
+            // Poner la primera imagen apenas carga
+            slides[0].style.backgroundImage = `url('${images[0]}')`;
+            slides[0].classList.add('active');
+            
+            // Cambiar imagen cada 5 segundos
+            setInterval(changeBackground, 5000);
+        }
+    }); 
 </script>
 {% endblock %}
