@@ -33,7 +33,7 @@
                                 Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a>.
                             </div>
                             <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
-                                + Añadir otra foto
+                                <i class="bi bi-plus-circle"></i> Añadir otra foto
                             </button>
                         </div>
 
@@ -59,9 +59,6 @@
                             <label for="maps_embed_url" class="form-label">Ubicación (Google Maps)</label>
                             <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
                                       placeholder='Pega el código <iframe> aquí'>{{ experiencia.maps_embed_url if experiencia.maps_embed_url else '' }}</textarea>
-                            <div class="form-text">
-                                Código "Insertar mapa" de Google Maps.
-                            </div>
                         </div>
                         
                         <button type="submit" class="btn btn-success">Guardar Cambios</button>
@@ -78,29 +75,35 @@
 
 {% block scripts %}
 <script>
-document.getElementById('add-image-btn').addEventListener('click', function() {
-    var container = document.getElementById('image-fields-container');
-    var newFieldGroup = document.createElement('div');
-    newFieldGroup.className = 'input-group mb-2';
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('add-image-btn');
+        const container = document.getElementById('image-fields-container');
 
-    var newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.className = 'form-control';
-    newInput.name = 'imagen_url';
-    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
-    newInput.required = true;
+        if (addBtn && container) {
+            addBtn.addEventListener('click', function() {
+                var newFieldGroup = document.createElement('div');
+                newFieldGroup.className = 'input-group mb-2';
 
-    var deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-outline-danger';
-    deleteButton.innerText = 'X';
-    deleteButton.onclick = function() {
-        container.removeChild(newFieldGroup);
-    };
+                var newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'form-control';
+                newInput.name = 'imagen_url';
+                newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+                newInput.required = true;
 
-    newFieldGroup.appendChild(newInput);
-    newFieldGroup.appendChild(deleteButton);
-    container.appendChild(newFieldGroup);
-});
+                var deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn btn-outline-danger';
+                deleteButton.innerText = 'X';
+                deleteButton.onclick = function() {
+                    container.removeChild(newFieldGroup);
+                };
+
+                newFieldGroup.appendChild(newInput);
+                newFieldGroup.appendChild(deleteButton);
+                container.appendChild(newFieldGroup);
+            });
+        }
+    });
 </script>
 {% endblock %}

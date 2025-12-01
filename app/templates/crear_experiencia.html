@@ -27,7 +27,7 @@
                                 Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
                             </div>
                             <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
-                                + Añadir otra foto
+                                <i class="bi bi-plus-circle"></i> Añadir otra foto
                             </button>
                         </div>
                         
@@ -70,29 +70,46 @@
 
 {% block scripts %}
 <script>
-document.getElementById('add-image-btn').addEventListener('click', function() {
-    var container = document.getElementById('image-fields-container');
-    var newFieldGroup = document.createElement('div');
-    newFieldGroup.className = 'input-group mb-2';
+    // Esperamos a que cargue todo el HTML antes de buscar el botón
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const addBtn = document.getElementById('add-image-btn');
+        const container = document.getElementById('image-fields-container');
 
-    var newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.className = 'form-control';
-    newInput.name = 'imagen_url';
-    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
-    newInput.required = true;
+        if (addBtn && container) {
+            addBtn.addEventListener('click', function() {
+                
+                // Crear el nuevo div
+                var newFieldGroup = document.createElement('div');
+                newFieldGroup.className = 'input-group mb-2';
 
-    var deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-outline-danger';
-    deleteButton.innerText = 'X';
-    deleteButton.onclick = function() {
-        container.removeChild(newFieldGroup);
-    };
+                // Crear el input
+                var newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'form-control';
+                newInput.name = 'imagen_url'; // Importante: mismo nombre para que llegue como lista
+                newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+                newInput.required = true;
 
-    newFieldGroup.appendChild(newInput);
-    newFieldGroup.appendChild(deleteButton);
-    container.appendChild(newFieldGroup);
-});
+                // Crear el botón de borrar (X)
+                var deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn btn-outline-danger';
+                deleteButton.innerText = 'X';
+                
+                // Función para borrar esa línea
+                deleteButton.onclick = function() {
+                    container.removeChild(newFieldGroup);
+                };
+
+                // Juntar todo
+                newFieldGroup.appendChild(newInput);
+                newFieldGroup.appendChild(deleteButton);
+                container.appendChild(newFieldGroup);
+            });
+        } else {
+            console.error("Error: No se encontró el botón o el contenedor de imágenes.");
+        }
+    });
 </script>
 {% endblock %}
