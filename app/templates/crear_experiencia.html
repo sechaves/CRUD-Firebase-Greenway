@@ -17,17 +17,20 @@
                     
                         <div class="mb-3">
                             <label class="form-label">Links (URL) de las Fotos</label>
+                            
                             <div id="image-fields-container">
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control" name="imagen_url" 
                                            placeholder="https://i.postimg.cc/... (Link directo)" required>
                                 </div>
                             </div>
+                            
                             <div class="form-text">
                                 Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a> y pega los "Enlaces directos".
                             </div>
+                            
                             <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
-                                + Añadir otra foto
+                                <i class="bi bi-plus-circle"></i> Añadir otra foto
                             </button>
                         </div>
                         
@@ -66,33 +69,55 @@
         </div> 
     </div> 
 </div> 
-{% endblock %}
 
-{% block scripts %}
 <script>
-document.getElementById('add-image-btn').addEventListener('click', function() {
-    var container = document.getElementById('image-fields-container');
-    var newFieldGroup = document.createElement('div');
-    newFieldGroup.className = 'input-group mb-2';
+    console.log("Script de crear experiencia CARGADO"); // Mira la consola (F12) para ver esto
 
-    var newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.className = 'form-control';
-    newInput.name = 'imagen_url';
-    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
-    newInput.required = true;
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const addBtn = document.getElementById('add-image-btn');
+        const container = document.getElementById('image-fields-container');
 
-    var deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-outline-danger';
-    deleteButton.innerText = 'X';
-    deleteButton.onclick = function() {
-        container.removeChild(newFieldGroup);
-    };
+        if (addBtn) {
+            console.log("Botón encontrado!"); // Confirmación en consola
 
-    newFieldGroup.appendChild(newInput);
-    newFieldGroup.appendChild(deleteButton);
-    container.appendChild(newFieldGroup);
-});
+            addBtn.addEventListener('click', function() {
+                console.log("Clic en añadir foto"); // Confirmación de clic
+
+                // 1. Crear el div contenedor de la línea
+                var newFieldGroup = document.createElement('div');
+                newFieldGroup.className = 'input-group mb-2';
+
+                // 2. Crear el input nuevo
+                var newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'form-control';
+                newInput.name = 'imagen_url'; // Importante: mismo nombre para que Flask haga una lista
+                newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+                newInput.required = true;
+
+                // 3. Crear el botón de eliminar (X)
+                var deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn btn-outline-danger';
+                deleteButton.innerText = 'X';
+                
+                // 4. Lógica para borrar esa línea específica
+                deleteButton.onclick = function() {
+                    container.removeChild(newFieldGroup);
+                };
+
+                // 5. Juntar las piezas
+                newFieldGroup.appendChild(newInput);
+                newFieldGroup.appendChild(deleteButton);
+                
+                // 6. Meterlo en la página
+                container.appendChild(newFieldGroup);
+            });
+        } else {
+            console.error("Error: No se encontró el botón con ID 'add-image-btn'");
+        }
+    });
 </script>
+
 {% endblock %}

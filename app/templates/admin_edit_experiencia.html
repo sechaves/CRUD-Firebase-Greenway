@@ -19,6 +19,7 @@
                 
                         <div class="mb-3">
                             <label class="form-label">Links (URL) de las Fotos</label>
+                            
                             <div id="image-fields-container">
                                 {% for img_url in experiencia.imagenes %}
                                 <div class="input-group mb-2">
@@ -29,11 +30,13 @@
                                 </div>
                                 {% endfor %}
                             </div>
+                            
                             <div class="form-text">
                                 Sube tus fotos a <a href="https://postimages.org/" target="_blank">Postimages.org</a>.
                             </div>
+                            
                             <button type="button" id="add-image-btn" class="btn btn-sm btn-outline-success mt-2">
-                                + Añadir otra foto
+                                <i class="bi bi-plus-circle"></i> Añadir otra foto
                             </button>
                         </div>
 
@@ -59,9 +62,6 @@
                             <label for="maps_embed_url" class="form-label">Ubicación (Google Maps)</label>
                             <textarea class="form-control" id="maps_embed_url" name="maps_embed_url" rows="3" 
                                       placeholder='Pega el código <iframe> aquí'>{{ experiencia.maps_embed_url if experiencia.maps_embed_url else '' }}</textarea>
-                            <div class="form-text">
-                                Código "Insertar mapa" de Google Maps.
-                            </div>
                         </div>
                         
                         <button type="submit" class="btn btn-success">Guardar Cambios</button>
@@ -74,33 +74,49 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-document.getElementById('add-image-btn').addEventListener('click', function() {
-    var container = document.getElementById('image-fields-container');
-    var newFieldGroup = document.createElement('div');
-    newFieldGroup.className = 'input-group mb-2';
+    console.log("Script de EDITAR cargado");
 
-    var newInput = document.createElement('input');
-    newInput.type = 'text';
-    newInput.className = 'form-control';
-    newInput.name = 'imagen_url';
-    newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
-    newInput.required = true;
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('add-image-btn');
+        const container = document.getElementById('image-fields-container');
 
-    var deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-outline-danger';
-    deleteButton.innerText = 'X';
-    deleteButton.onclick = function() {
-        container.removeChild(newFieldGroup);
-    };
+        if (addBtn) {
+            console.log("Botón de editar encontrado");
+            
+            addBtn.addEventListener('click', function() {
+                // 1. Crear div
+                var newFieldGroup = document.createElement('div');
+                newFieldGroup.className = 'input-group mb-2';
 
-    newFieldGroup.appendChild(newInput);
-    newFieldGroup.appendChild(deleteButton);
-    container.appendChild(newFieldGroup);
-});
+                // 2. Crear input
+                var newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'form-control';
+                newInput.name = 'imagen_url';
+                newInput.placeholder = 'https://i.postimg.cc/... (Otro link)';
+                newInput.required = true;
+
+                // 3. Crear botón borrar
+                var deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn btn-outline-danger';
+                deleteButton.innerText = 'X';
+                
+                deleteButton.onclick = function() {
+                    container.removeChild(newFieldGroup);
+                };
+
+                // 4. Juntar y pegar
+                newFieldGroup.appendChild(newInput);
+                newFieldGroup.appendChild(deleteButton);
+                container.appendChild(newFieldGroup);
+            });
+        } else {
+            console.error("No encontré el botón #add-image-btn");
+        }
+    });
 </script>
+
 {% endblock %}
