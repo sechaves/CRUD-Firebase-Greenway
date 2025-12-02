@@ -1,16 +1,78 @@
-Autores: Sergio Gabriel Chaves Mosquera, Maria Jose Sanchez Portillo, Samuel Esteban Reyes Beltran
+# 🌿 GREENWAY - Plataforma de Ecoturismo
 
-Historia de Usuario 5 - Login
+![Estado del Proyecto](https://img.shields.io/badge/Estado-Finalizado-success?style=for-the-badge)
+![Versión](https://img.shields.io/badge/Versión-1.0.0-blue?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.13-yellow?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Web_Framework-lightgrey?style=for-the-badge&logo=flask)
+![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-orange?style=for-the-badge&logo=firebase)
 
-Descripción: En este repositorio se encuentra el programa que ejecuta una CRUD conectada a realtime database en Firebase, con un formulario login para ingresar al home.html que revisa la veracidad de las credenciales de seguridad, y tambien se cuenta con un formulario register para registrar nuevos usuarios en la base de datos los cuales deben despues de crear su cuenta, iniciar sesión con sus credenciales antes de poder seguir al home.
+**Greenway** es una aplicación web full-stack diseñada para conectar a turistas con experiencias locales de ecoturismo en el municipio de El Santuario. La plataforma permite la gestión de reservas, comunicación en tiempo real y administración de contenidos mediante roles de seguridad.
 
-El comando para poder ejecutar el programa es: python -m app.main
+---
 
-A continuación adjunto capturas de la ejecución del programa y sus salidas tanto en el env (entorno virtual para poder visualizar las plantillas en un navegador) como en la misma consola.
+## 🚀 Características Principales
 
+### 👤 Gestión de Usuarios y Roles (RBAC)
+* **Autenticación Segura:** Registro e inicio de sesión mediante **Firebase Auth**.
+* **Roles Diferenciados:**
+    * **Usuario:** Puede explorar, buscar y chatear con anfitriones.
+    * **Propietaria:** Puede crear, editar y eliminar sus experiencias.
+    * **Admin:** Panel de control total, moderación de usuarios y contenido.
 
-<img width="982" height="681" alt="image" src="https://github.com/user-attachments/assets/b083a018-9285-4153-a459-3871c8019e03" />
-<img width="922" height="690" alt="image" src="https://github.com/user-attachments/assets/36c91617-c92e-4973-a679-f77a9e8ef1ce" />
-<img width="1919" height="958" alt="image" src="https://github.com/user-attachments/assets/d88db3c0-dc61-4020-b4f1-66fffbf8da59" />
-<img width="1919" height="958" alt="image" src="https://github.com/user-attachments/assets/1c992d80-6248-498d-ab6e-a05745ca7849" />
-<img width="882" height="974" alt="image" src="https://github.com/user-attachments/assets/3a52b6b3-125f-41ac-8e94-cb6823646433" />
+### 💬 Chat en Tiempo Real (Arquitectura NoSQL)
+* Implementación de mensajería instantánea sin sockets tradicionales.
+* Sincronización directa **Cliente <-> Firebase Realtime Database**.
+* Estructura de datos basada en objetos JSON anidados.
+* Historial persistente y notificaciones visuales inmediatas.
+
+### 🤖 Asistente Virtual con IA
+* Chatbot integrado potenciado por **OpenAI (GPT)**.
+* Disponible 24/7 en toda la aplicación para resolver dudas de los viajeros.
+
+### 🌎 Experiencia de Usuario (UX)
+* **Geolocalización:** Integración de mapas interactivos con Google Maps Embed API.
+* **Búsqueda Inteligente:** Filtrado de experiencias en tiempo real.
+* **Galería Dinámica:** Carrusel de imágenes con soporte para múltiples fotos y fallback automático.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+El proyecto fue construido utilizando una arquitectura **MVC (Modelo-Vista-Controlador)** adaptada a microframeworks.
+
+| Área | Tecnología | Descripción |
+| :--- | :--- | :--- |
+| **Backend** | Python + Flask | Lógica del servidor y rutas. |
+| **Base de Datos** | Firebase Realtime DB | Base de datos NoSQL basada en la nube. |
+| **Auth** | Firebase Authentication | Gestión de identidad y seguridad. |
+| **Frontend** | HTML5, CSS3, JS | Interfaz de usuario responsiva. |
+| **Estilos** | Bootstrap 5 | Framework de diseño y componentes. |
+| **IA** | OpenAI API | Procesamiento de lenguaje natural. |
+| **Deploy** | Render | Infraestructura como servicio (PaaS). |
+
+---
+
+## 📂 Estructura del Proyecto
+
+```text
+GREENWAY/
+│
+├── app/
+│   ├── static/              # Archivos públicos (CSS, JS, Imágenes)
+│   └── templates/           # Plantillas HTML (Jinja2)
+│       ├── base.html        # Layout maestro
+│       ├── home.html        # Página principal
+│       ├── chats.html       # Lógica del chat
+│       └── ...
+│
+├── data/
+│   ├── firebase_config.py   # Configuración del SDK Cliente
+│   └── firebase_admin.py    # Configuración del SDK Admin
+│
+├── domain/
+│   ├── models.py            # Modelos de Clases (POO)
+│   └── openai_chatbot.py    # Lógica del Bot
+│
+├── main.py                  # Controlador Principal (App Entry Point)
+├── requirements.txt         # Dependencias
+└── serviceAccountKey.json   # Credenciales (No incluidas en repo)
