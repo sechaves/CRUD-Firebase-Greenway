@@ -76,3 +76,12 @@ GREENWAY/
 ├── main.py                  # Controlador Principal (App Entry Point)
 ├── requirements.txt         # Dependencias
 └── serviceAccountKey.json   # Credenciales (No incluidas en repo)
+```
+
+🎥 Sustentación y Demo
+
+Mira la demostración completa del funcionamiento del Frontend, la arquitectura y el flujo de usuario en el siguiente video:
+
+[![Ver Video de Sustentación](https://img.youtube.com/vi/SuZTOu1oG5Y/0.jpg)](https://youtu.be/SuZTOu1oG5Y)
+
+> *Clic en la imagen para ver el video en YouTube.*
